@@ -1,7 +1,11 @@
 const Koa = require('koa');
 const path = require('path');
 const fs = require('fs');
-const views = require('koa-views')
+const views = require('koa-views');
+const helper = require('./utils/helper');
+
+//注册全局的helper
+global.helper = helper;
 
 const app = new Koa();
 
@@ -37,13 +41,6 @@ autoImportFile(app, [
     './apis',
     './routers'
 ]);
-
-// if (app.env == 'development') {
-//     autoRestart([
-//         './apis',
-//         './routers'
-//     ]);
-// }
 
 app.use(ctx => {
     ctx.body = '测试服务起';
