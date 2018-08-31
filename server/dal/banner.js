@@ -23,4 +23,4 @@ class bannerDal {
     }
 }
 
-module.exports = bannerDal;
+module.exports = new bannerDal();

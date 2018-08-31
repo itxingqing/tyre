@@ -5,8 +5,6 @@ const router = new Router({
 });
 
 router.get('/', (ctx, next) => {
-    console.log('&&&&&&&&&&&&&&&&&&')
-    console.log(bannerDll.toString());
 
     ctx.body = bannerDll.findAll();
 });

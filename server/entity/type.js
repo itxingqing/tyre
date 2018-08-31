@@ -1,31 +1,26 @@
-const Sequlize = require('sequelize');
-const sequelize = require('../utils/dbUtils');
-
-module.exports = sequelize.define('type', {
+module.exports = {
     id: {
-        type: Sequlize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+        type: 'number'
     },
     ty_name: {
-        type: Sequlize.STRING(128),
-        defaultValue: ''
+        type: 'string',
+        length: 128
     },
     ty_i18n: {
-        type: Sequlize.JSON
+        type: 'object'
     },
     ct_user: {
-        type: Sequlize.STRING(64),
-        defaultValue: ''
+        type: 'string',
+        length: 64
     },
     ct_time: {
-        type: Sequlize.DATE,
+        type: 'date'
     },
     mfy_user: {
-        type: Sequlize.STRING(64),
-        defaultValue: ''
+        type: 'string',
+        length: 64
     },
     mfy_time: {
-        type: Sequlize.DATE
-    }
-});
+        type: 'date'
+    }    
+}

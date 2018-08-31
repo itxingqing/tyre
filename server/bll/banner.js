@@ -7,7 +7,4 @@ class bannerBll {
     }
 }
 
-console.log('***************');
-console.log(bannerBll);
-
-module.exports = bannerBll;
+module.exports = new bannerBll();

@@ -1,14 +1,9 @@
-const Sequlize = require('sequelize');
-const sequelize = require('../utils/dbUtils');
-
-module.exports = sequelize.define('banner', {
+module.exports = {
     id: {
-        type: Sequlize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+        type: 'number',        
     },
     img: {
-        type: Sequlize.STRING(128),
-        allowNull: false
+        type: 'string',
+        length: 128
     }
-});
+}
