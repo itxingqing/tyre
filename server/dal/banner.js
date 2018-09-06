@@ -1,26 +1,14 @@
-const banner = require('../entity/banner');
+const { banner } = require('../entity/index');
 
-class bannerDal {
+class BannerDal {
 
     async findAll() {
-        return await banner.findAll();
-    }
-
-    save(banner) {
-        let that = this;
-
-        banner.create(banner).then((result) => {
-            console.log('*****************')
-        }).catch((err) => {
-            console.log('666666666666666');
-        });
-    }
-
-    async del(id) {
-        return banner.destroy({
-            id: id
-        });
+        
+        banner.findAll().then(data => {
+            console.log(data)
+        })
+        return "";
     }
 }
 
-module.exports = new bannerDal();
+module.exports = new BannerDal();

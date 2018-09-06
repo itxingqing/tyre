@@ -1,24 +1,14 @@
-const users = require('../entity/users');
+const { users } = require('../entity/index');
 
-class userDal{
+class UsersDal {
 
-    async findByID(id){
-        return await users.find({
-            where: {
-                id: id
-            }
-        });
+    async findAll() {
+        
+        users.findAll().then(data => {
+            console.log(data)
+        })
+        return "";
     }
-
-    async findByName(){
-        return await users.find({
-            where: {
-                uname: uname
-            }
-        });
-    }
-
-    
 }
 
-module.exports = userDal;
+module.exports = new UsersDal();

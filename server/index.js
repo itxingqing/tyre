@@ -1,6 +1,6 @@
 const Koa = require('koa');
 const path = require('path');
-const fs = require('fs');
+// const fs = require('fs');
 const views = require('koa-views');
 const helper = require('./utils/helper');
 
@@ -13,34 +13,44 @@ app.use(views(path.join(__dirname, './view'), {
     extension: 'ejs'
 }));
 
-const autoImportFile = function (app, paths) {
-    paths.forEach(p => {
-        var fileDir = path.resolve(__dirname, p),
-            fileList = fs.readdirSync(fileDir),
-            dirArr = [];
+helper.autoImportFile([
+    path.resolve(__dirname, './api'),
+    path.resolve(__dirname, './router')
 
-        fileList.forEach(item => {
-            var file = path.resolve(fileDir, item);
-            stat = fs.statSync(file);
+    // './api',
+    // './router'
+], (fileContent, fileName) =>{
+    app.use(fileContent);
+});
 
-            if (stat.isDirectory()) {
-                dirArr.push(p + '/' + item);
-            } else if (/\.js$/.test(item)) {
-                var mod = require(p + '/' + item);
-                app.use(mod);
-            }
-        });
+// const autoImportFile = function (app, paths) {
+//     paths.forEach(p => {
+//         var fileDir = path.resolve(__dirname, p),
+//             fileList = fs.readdirSync(fileDir),
+//             dirArr = [];
 
-        if (dirArr.length) {
-            autoImportFile(app, dirArr);
-        }
-    });
-}
+//         fileList.forEach(item => {
+//             var file = path.resolve(fileDir, item);
+//             stat = fs.statSync(file);
 
-autoImportFile(app, [
-    './apis',
-    './routers'
-]);
+//             if (stat.isDirectory()) {
+//                 dirArr.push(p + '/' + item);
+//             } else if (/\.js$/.test(item)) {
+//                 var mod = require(p + '/' + item);
+//                 app.use(mod);
+//             }
+//         });
+
+//         if (dirArr.length) {
+//             autoImportFile(app, dirArr);
+//         }
+//     });
+// }
+
+// autoImportFile(app, [
+//     './api',
+//     './router'
+// ]);
 
 app.use(ctx => {
     ctx.body = '测试服务起';

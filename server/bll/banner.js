@@ -1,10 +1,12 @@
-const bannerDal = require('../dal/banner');
+const { bannerDal } = require('../dal/index');
 
-class bannerBll {
+class BannerBll {
 
-    findAll(){
-        return bannerDal.findAll();
+    async findAll(){
+        var data = await bannerDal.findAll();
+
+        return data;
     }
 }
 
-module.exports = new bannerBll();
+module.exports = new BannerBll();

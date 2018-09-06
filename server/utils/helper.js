@@ -1,3 +1,6 @@
+const path = require('path');
+const fs = require('fs');
+
 class helper {
 
     /**
@@ -6,7 +9,7 @@ class helper {
      * 
      * @return {string} 格式化后的字符串
      */
-    dateFormat(date, format) {
+    static dateFormat(date, format) {
         var o = {
             "M+": date.getMonth() + 1, //month 
             "d+": date.getDate(), //day 
@@ -34,7 +37,7 @@ class helper {
      * 
      * @return {string} 生成
      */
-    guid(separator) {
+    static guid(separator) {
         var guid = "";
         for (var i = 1; i <= 32; i++) {
             var n = Math.floor(Math.random() * 16.0).toString(16);
@@ -45,6 +48,40 @@ class helper {
             }
         }
         return guid.toLocaleLowerCase();
+    }
+
+    /**
+     * 
+     * @param {String} paths 自动引入的目录, 数组
+     * @param {Fcunction}} callback 回调方法, 注入两个参数，一个是引入的文件，一个是文件名称
+     */
+    static autoImportFile(paths, callback, pathArray) {
+        pathArray = pathArray || [];
+
+        paths.forEach(p => {
+            var fileList = fs.readdirSync(p),
+                dirArr = [];
+
+            fileList.forEach(item => {
+                var file = path.resolve(p, item),
+                    stat = fs.statSync(file),
+                    filePath = path.join(p, item);
+
+                if (stat.isDirectory()) {
+                    dirArr.push(filePath);
+                    pathArray.push(item);
+
+                } else if (path.extname(item) == '.js') {
+
+                    var fileContent = require(filePath);
+                    callback && callback(fileContent, item, pathArray);
+                }
+            });
+
+            if (dirArr.length) {
+                autoImportFile(dirArr, callback, pathArray);
+            }
+        });
     }
 }
 

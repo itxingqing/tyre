@@ -1,9 +1,65 @@
+const {
+    INTEGER,
+    STRING,
+    DATE
+} = require('sequelize');
+
 module.exports = {
-    id: {
-        type: 'number',        
+    name: 'banner',
+    columns: {
+        id: {
+            type: INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        img: {
+            type: STRING(128),
+            allowNull: false
+        },
+        ct_time: {
+            type: DATE
+        },
+        mfy_time: {
+            type: DATE
+        }
     },
-    img: {
-        type: 'string',
-        length: 128
+    options: {
+        tableName: 'banner',
+        timestamps: true,
+        createdAt: 'ct_time',
+        updatedAt: 'mfy_time',
     }
 }
+
+// module.exports = sequelize.define('banner', {
+//     id: {
+//         type: INTEGER,
+//         primaryKey: true,
+//         autoIncrement: true
+//     },
+//     img: {
+//         type: STRING(128),
+//         allowNull: false
+//     },
+//     ct_time: {
+//         type: DATE
+//     },
+//     mfy_time: {
+//         type: DATE
+//     }
+// }, {
+//     tableName: 'banner',
+//     timestamps: true,
+//     createdAt: 'ct_time',
+//     updatedAt: 'mfy_time',
+// });
+
+// module.exports = {
+//     id: {
+//         type: 'number',        
+//     },
+//     img: {
+//         type: 'string',
+//         length: 128
+//     }
+// }
