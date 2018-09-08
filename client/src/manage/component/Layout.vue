@@ -24,14 +24,12 @@
 		</el-header>
 		<el-container class="content">
 			<el-aside width="200px" class="navbar">
-				<el-menu :default-openeds="['1', '3']" background-color="#eff1f6">
-					<el-menu-item index="1">
-						<i class="el-icon-setting"></i>
-						<span slot="title">导航四</span>
+				<el-menu :default-openeds="['1', '3']" background-color="#eff1f6" router>
+					<el-menu-item index="/banner">
+						1111
 					</el-menu-item>
-					<el-menu-item index="2">
-						<i class="el-icon-setting"></i>
-						<span slot="title">导航四</span>
+					<el-menu-item index="/product">
+						22222
 					</el-menu-item>
 
 				</el-menu>
@@ -50,21 +48,8 @@
 				</div>
 
 				<div class="main-body">
-					<el-row class="table">
-						<el-table border style="width: 100%">
-							<el-table-column prop="date" label="日期" width="180">
-							</el-table-column>
-							<el-table-column prop="name" label="姓名" width="180">
-							</el-table-column>
-							<el-table-column prop="address" label="地址">
-							</el-table-column>
-						</el-table>
-					</el-row>
+					<router-view class="main-body-content"></router-view>
 
-					<el-row class="pager">
-						<el-pagination background layout="prev, pager, next" :total="1000">
-						</el-pagination>
-					</el-row>
 				</div>
 
 				<el-footer class="main-footer">Copy</el-footer>
@@ -75,7 +60,24 @@
 
 <script>
 export default {
-    name: "Layout"
+    name: "Layout",
+    data() {
+        return {
+			clientHeight: "600px",
+        };
+	},
+	
+    mounted() {
+        // 动态设置背景图的高度为浏览器可视区域高度
+
+        // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+        this.clientHeight.height = `${document.documentElement.clientHeight}px`;
+        // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+        const that = this;
+        window.onresize = function() {
+            that.clientHeight = `${document.documentElement.clientHeight}px`;
+        };
+    }
 };
 </script>
 
@@ -139,13 +141,18 @@ export default {
         }
 
         .main-body {
-            .table {
-                padding-bottom: 16px;
-            }
+            position: relative;
+            overflow: hidden;
+            top: 0;
+            bottom: 10px;
+            // width: 100%;
+            // .table {
+            //     padding-bottom: 16px;
+            // }
 
-            .pager {
-                text-align: center;
-            }
+            // .pager {
+            //     text-align: center;
+            // }
         }
 
         .main-footer {
@@ -153,8 +160,8 @@ export default {
             bottom: 0;
             left: 0;
             right: 0;
-			line-height: 40px;
-			height: 40px !important;
+            line-height: 40px;
+            height: 40px !important;
             text-align: center;
             background-color: #e4e4e4;
         }
@@ -163,11 +170,11 @@ export default {
 
 .navbar {
     background-color: @nav-color;
-	border: 1px solid @nav-color;
-	
-	.el-menu-item.is-active{
-		border-right: 3px solid @header-color;
-		background-color: rgba(0, 0, 0, 0.06) !important;
-	}
+    border: 1px solid @nav-color;
+
+    .el-menu-item.is-active {
+        border-right: 3px solid @header-color;
+        background-color: rgba(0, 0, 0, 0.06) !important;
+    }
 }
 </style>

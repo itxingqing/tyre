@@ -58,6 +58,7 @@ module.exports = {
     output: {
         path: `${outputPath}`,
         filename: '[name]/index[hash:4].js',
+        chunkFilename: 'manage/chunks/[name][hash:4].js',
     },
     // context: sourcePath,
     resolve: {
