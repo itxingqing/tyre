@@ -1,5 +1,6 @@
 const path = require('path');
 const extractTextPlugin = require("extract-text-webpack-plugin");
+const vueLoaderPlugin = require('vue-loader/lib/plugin');
 const htmlPlugin = require('html-webpack-plugin');
 const fs = require('fs');
 
@@ -10,10 +11,11 @@ const happyThreadPool = happyPack.ThreadPool({
     size: os.cpus().length
 });
 
-const mainPath = path.resolve(__dirname, '../src/main');
+// const sourcePath = path.resolve(__dirname, '../src');
+// const mainPath = path.resolve(__dirname, '../src/main');
 const managePath = path.resolve(__dirname, '../src/manage');
 const outputPath = path.resolve(__dirname, '../dist');
-const mainOutputPath = path.resolve(__dirname, '../dist/main');
+// const mainOutputPath = path.resolve(__dirname, '../dist/main');
 const manageOutPath = path.resolve(__dirname, '../dist/manage');
 
 //移除dist生成的path
@@ -21,7 +23,7 @@ function rmGenFile(outputPath) {
     let files = fs.readdirSync(outputPath);
 
     files.forEach((item) => {
-        if (item !== 'upload') {
+        if (item !== 'upload' && item != 'favicon.ico') {
             var fpath = path.resolve(outputPath, item),
                 fstat = fs.statSync(fpath);
 
@@ -38,6 +40,17 @@ function rmGenFile(outputPath) {
 rmGenFile(outputPath);
 
 module.exports = {
+    performance: {
+        hints: false
+        // hints: "warning", // 枚举
+        // maxAssetSize: 300000, // 整数类型（以字节为单位）
+        // maxEntrypointSize: 500000, // 整数类型（以字节为单位）
+        // assetFilter: function (assetFilename) {
+        //     // 提供资源文件名的断言函数
+        //     return assetFilename.endsWith('.css') || assetFilename.endsWith('.js');
+        // }
+    },
+
     entry: {
         // 'main': [`${mainPath}/index.js`],
         'manage': [`${managePath}/index.js`]
@@ -46,7 +59,15 @@ module.exports = {
         path: `${outputPath}`,
         filename: '[name]/index[hash:4].js',
     },
-
+    // context: sourcePath,
+    resolve: {
+        //一定要添加，不然无法找到vue文件
+        extensions: ['.js', '.vue', '.json', 'less'],
+        alias: {
+            'vue': 'vue/dist/vue.js',
+            '@manage': `${managePath}`
+        }
+    },
     optimization: {
         splitChunks: {
             chunks: 'all'
@@ -54,6 +75,8 @@ module.exports = {
         runtimeChunk: true
     },
     plugins: [
+        new vueLoaderPlugin(),
+
         // new htmlPlugin({
         //     filename: `${mainOutputPath}/index.html`,
         //     template: `${mainPath}/index.html`,
@@ -64,23 +87,24 @@ module.exports = {
             filename: `${manageOutPath}/index.html`,
             template: `${managePath}/index.html`,
             inject: 'body',
-            title: '轮胎',
+            // title: '轮胎',
         }),
 
-        new extractTextPlugin(`/css/common[hash:4].css`),
+        //不能写成common.css，打包的时候会缺少文件
+        new extractTextPlugin(`css/[name][hash:4].css`),
 
         new happyPack({ //多线程打包js
             id: 'happybabel',
             loaders: ['babel-loader?cacheDirectory=true?presets=es2015'],
             threadPool: happyThreadPool,
-            cache: true,
+            // cache: true,
             verbose: true
         }),
         new happyPack({ //多线程打包css
             id: 'postcss',
             loaders: ["css-loader?-autoprefixer!postcss-loader"],
             threadPool: happyThreadPool,
-            cache: true,
+            // cache: true,
             verbose: true
         }),
         new happyPack({ //多线程打包less
@@ -88,24 +112,20 @@ module.exports = {
             //https://segmentfault.com/q/1010000009157879，注意编译顺序
             loaders: ['css-loader?-autoprefixer!postcss-loader!less-loader'],
             threadPool: happyThreadPool,
-            cache: true,
+            // cache: true,
             verbose: true
         }),
     ],
     module: {
         rules: [{
-                test: /\.js$/,
-                loader: 'happypack/loader?id=happybabel', //已经在.babelrc配置，这里配置的话多线程任务会出错
-                exclude: /node_modules/
-            },
-            {
                 test: /\.vue$/,
                 loader: 'vue-loader',
                 options: {
+                    extractCSS: true,
                     loaders: {
                         css: extractTextPlugin.extract({
                             use: ["happypack/loader?id=postcss"],
-                            fallback: 'vue-style-loader'
+                            fallback: 'vue-style-loader',
                         }),
                         less: extractTextPlugin.extract({
                             use: ["happypack/loader?id=postless"],
@@ -113,6 +133,11 @@ module.exports = {
                         }),
                     }
                 }
+            },
+            {
+                test: /\.js$/,
+                loader: 'happypack/loader?id=happybabel', //已经在.babelrc配置，这里配置的话多线程任务会出错
+                exclude: /node_modules/
             },
             {
                 test: /\.css$/,

@@ -1,13 +1,22 @@
 const Koa = require('koa');
 const path = require('path');
-// const fs = require('fs');
+const static = require('koa-static')
 const views = require('koa-views');
 const helper = require('./utils/helper');
+// const favicon = require('koa-favicon');
 
 //注册全局的helper
 global.helper = helper;
 
 const app = new Koa();
+
+// app.use(favicon('../client/dist/favicon.ico'));
+
+//后面改成nginx映射
+const staticPath =  '../client/dist'
+app.use(static(
+    path.join(__dirname, staticPath)
+))
 
 app.use(views(path.join(__dirname, './view'), {
     extension: 'ejs'
@@ -19,7 +28,7 @@ helper.autoImportFile([
 
     // './api',
     // './router'
-], (fileContent, fileName) =>{
+], (fileContent, fileName) => {
     app.use(fileContent);
 });
 
@@ -52,8 +61,8 @@ helper.autoImportFile([
 //     './router'
 // ]);
 
-app.use(ctx => {
-    ctx.body = '测试服务起';
-});
+// app.use(ctx => {
+//     ctx.body = '测试服务起';
+// });
 
 app.listen(8888);

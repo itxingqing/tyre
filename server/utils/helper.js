@@ -83,6 +83,10 @@ class helper {
             }
         });
     }
+
+    static getClientPath(){
+        return path.resolve(__dirname, '../../client/dist');
+    }
 }
 
 module.exports = helper;

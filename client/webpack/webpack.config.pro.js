@@ -7,7 +7,7 @@ const cssnano = require('cssnano');
 const postSafeParse = require('postcss-safe-parser');
 
 module.exports = merge(baseWebpackConfig, {
-    mode: 'development',
+    mode: 'production',
     plugins: [
         new uglifyjs(),
 
