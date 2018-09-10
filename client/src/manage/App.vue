@@ -15,4 +15,5 @@ export default {
 // ubuntu 系统导入less 要使用 ～@manage，别名要添加～
 @import "~@manage/less/reset";
 @import "~@manage/less/common";
+@import "~@manage/less/custom";
 </style>

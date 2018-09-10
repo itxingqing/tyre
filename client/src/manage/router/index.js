@@ -23,6 +23,9 @@ const routes = [{
             path: 'banner',
             component: () =>
                 import('@manage/page/banner/index'),
+                // component: function(resolve) {
+                //     require(['@manage/page/banner/index'], resolve);
+                // },
             meta: {
                 name: '封面设置',
             }

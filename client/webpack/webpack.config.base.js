@@ -71,9 +71,11 @@ module.exports = {
     },
     optimization: {
         splitChunks: {
-            chunks: 'all'
+            chunks: 'all',
+            minChunks: 2,
         },
         runtimeChunk: true
+        // runtimeChunk: "multiple"
     },
     plugins: [
         new vueLoaderPlugin(),
@@ -88,11 +90,17 @@ module.exports = {
             filename: `${manageOutPath}/index.html`,
             template: `${managePath}/index.html`,
             inject: 'body',
+            // chunksSortMode: 'auto',
+            // chunks: ['vendor']
             // title: '轮胎',
         }),
 
         //不能写成common.css，打包的时候会缺少文件
-        new extractTextPlugin(`css/[name][hash:4].css`),
+        //https://github.com/lavas-project/lavas/issues/85
+        new extractTextPlugin({
+            filename: `css/[name][hash:4].css`,
+            allChunks: true
+        }),
 
         new happyPack({ //多线程打包js
             id: 'happybabel',

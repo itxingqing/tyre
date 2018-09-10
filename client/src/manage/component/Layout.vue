@@ -1,82 +1,83 @@
 <template>
-	<el-container>
-		<el-header class="header clearfix">
-			<div class="inline-block title">
-				轮胎管理系统
-			</div>
-			<div class="pull-left">
+    <el-container>
+        <el-header class="header clearfix">
+            <div class="inline-block title">
+                轮胎管理系统
+            </div>
+            <div class="pull-left">
 
-			</div>
+            </div>
 
-			<!-- <div><el-button type="primary" icon="el-icon-d-arrow-left" circle></el-button></div> -->
-			<div class="pull-right">
-				<el-dropdown class="dropdown-link">
-					<span>
-						<span class="inline-block bg-cover user-image"></span>
-						<span class="inline-block">用户名</span>
-					</span>
-					<el-dropdown-menu slot="dropdown">
-						<el-dropdown-item>退出登录</el-dropdown-item>
-					</el-dropdown-menu>
-				</el-dropdown>
-			</div>
+            <!-- <div><el-button type="primary" icon="el-icon-d-arrow-left" circle></el-button></div> -->
+            <div class="pull-right">
+                <el-dropdown class="dropdown-link">
+                    <span>
+                        <span class="inline-block bg-cover user-image"></span>
+                        <span class="inline-block">用户名</span>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item>退出登录</el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+            </div>
 
-		</el-header>
-		<el-container class="content">
-			<el-aside width="200px" class="navbar">
-				<el-menu :default-openeds="['1', '3']" background-color="#eff1f6" router>
-					<el-menu-item index="/banner">
-						1111
-					</el-menu-item>
-					<el-menu-item index="/product">
-						22222
-					</el-menu-item>
+        </el-header>
+        <el-container class="content">
+            <el-aside width="200px" class="navbar">
+                <el-menu :default-openeds="['1', '3']" background-color="#eff1f6" router>
+                    <el-menu-item index="/banner">
+                        1111
+                    </el-menu-item>
+                    <el-menu-item index="/product">
+                        22222
+                    </el-menu-item>
 
-				</el-menu>
-			</el-aside>
+                </el-menu>
+            </el-aside>
 
-			<el-main class="main">
-				<div class="main-header">
-					<el-breadcrumb separator="/">
-						<el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-						<el-breadcrumb-item>
-							<a href="/">活动管理</a>
-						</el-breadcrumb-item>
-						<el-breadcrumb-item>活动列表</el-breadcrumb-item>
-						<el-breadcrumb-item>活动详情</el-breadcrumb-item>
-					</el-breadcrumb>
-				</div>
+            <el-main class="main">
+                <div class="main-header">
+                    <el-breadcrumb separator="/">
+                        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+                        <el-breadcrumb-item>
+                            <a href="/">活动管理</a>
+                        </el-breadcrumb-item>
+                        <el-breadcrumb-item>活动列表</el-breadcrumb-item>
+                        <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+                    </el-breadcrumb>
+                </div>
 
-				<div class="main-body">
-					<router-view class="main-body-content"></router-view>
+                <div class="main-body" ref="mainBody">
+                    <router-view class="main-body-content" :bodyHeight="bodyHeight"></router-view>
+                </div>
 
-				</div>
-
-				<el-footer class="main-footer">Copy</el-footer>
-			</el-main>
-		</el-container>
-	</el-container>
+                <el-footer class="main-footer">Copy</el-footer>
+            </el-main>
+        </el-container>
+    </el-container>
 </template>
 
 <script>
+import _ from "lodash";
+import { setTimeout } from "timers";
+
 export default {
     name: "Layout",
     data() {
         return {
-			clientHeight: "600px",
+            bodyHeight: 500
         };
-	},
-	
-    mounted() {
-        // 动态设置背景图的高度为浏览器可视区域高度
+    },
 
-        // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
-        this.clientHeight.height = `${document.documentElement.clientHeight}px`;
-        // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
-        const that = this;
-        window.onresize = function() {
-            that.clientHeight = `${document.documentElement.clientHeight}px`;
-        };
+    mounted() {
+        const that = this,
+            resize = () => {
+                that.bodyHeight = that.$refs.mainBody.offsetHeight;
+            };
+
+        setTimeout(resize, 0);
+
+        window.onresize = _.debounce(resize, 300);
     }
 };
 </script>
@@ -89,7 +90,7 @@ export default {
     border-bottom: @header-color;
     background-color: @header-color;
     color: white;
-    padding-left: 0;
+    padding-left: 0 !important;
 
     .title {
         width: 200px;
@@ -141,18 +142,12 @@ export default {
         }
 
         .main-body {
-            position: relative;
+            position: absolute;
             overflow: hidden;
-            top: 0;
-            bottom: 10px;
-            // width: 100%;
-            // .table {
-            //     padding-bottom: 16px;
-            // }
-
-            // .pager {
-            //     text-align: center;
-            // }
+            top: 55px;
+            bottom: 40px;
+            left: 0;
+            right: 0;
         }
 
         .main-footer {

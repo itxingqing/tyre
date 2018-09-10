@@ -1,8 +1,8 @@
 <template>
     <div>
-
-        <el-row>
-            <el-table stripe :data="tableData" style="width: 100%">
+        <!-- <div>{{tabelHeight}}</div> -->
+        <el-row class="table-container">
+            <el-table border stripe :data="tableData" style="width: 100%" :height="tabelHeight">
                 <el-table-column prop="date" label="日期" width="180">
                 </el-table-column>
                 <el-table-column prop="name" label="姓名" width="180">
@@ -12,7 +12,7 @@
             </el-table>
         </el-row>
 
-        <el-row>
+        <el-row class="pager">
             <el-pagination background layout="prev, pager, next" :total="1000">
             </el-pagination>
         </el-row>
@@ -39,6 +39,9 @@ import Edit from "./edit";
 
 export default {
     name: "product",
+
+    props: ['bodyHeight'],
+
     data() {
         return {
             tableData: [
@@ -173,9 +176,16 @@ export default {
         Edit
     },
 
-    computed: {},
+    computed: {
+        tabelHeight(){   
+            return this.bodyHeight - 80;
+        }
+    },
 
-    mounted: () => {},
+    mounted: () => {
+
+        // console.log(this);
+    },
 
     methods: {}
 };
