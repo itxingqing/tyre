@@ -8,7 +8,6 @@
 
             </div>
 
-            <!-- <div><el-button type="primary" icon="el-icon-d-arrow-left" circle></el-button></div> -->
             <div class="pull-right">
                 <el-dropdown class="dropdown-link">
                     <span>
@@ -16,6 +15,7 @@
                         <span class="inline-block">用户名</span>
                     </span>
                     <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item>修改密码</el-dropdown-item>
                         <el-dropdown-item>退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
@@ -24,31 +24,37 @@
         </el-header>
         <el-container class="content">
             <el-aside width="200px" class="navbar">
-                <el-menu :default-openeds="['1', '3']" background-color="#eff1f6" router>
-                    <el-menu-item index="/banner">
-                        1111
-                    </el-menu-item>
-                    <el-menu-item index="/product">
-                        22222
-                    </el-menu-item>
-
+                <el-menu :default-active="$route.path" background-color="#eff1f6" router>
+                    <menu-tree :menu="menu"></menu-tree>
                 </el-menu>
             </el-aside>
 
             <el-main class="main">
                 <div class="main-header">
                     <el-breadcrumb separator="/">
-                        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+                        <template v-for="(item, index) in $route.meta.paths">
+                            <template v-if="item.url">
+                                <el-breadcrumb-item :to="{ path: item.url }" :key="index">{{item.name}}</el-breadcrumb-item>
+                            </template>
+
+                            <template>
+                                <el-breadcrumb-item :key="index">{{item.name}}</el-breadcrumb-item>
+                            </template>
+                        </template>
+
+                        <!-- <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
                         <el-breadcrumb-item>
                             <a href="/">活动管理</a>
                         </el-breadcrumb-item>
                         <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-                        <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+                        <el-breadcrumb-item>活动详情</el-breadcrumb-item> -->
                     </el-breadcrumb>
                 </div>
 
                 <div class="main-body" ref="mainBody">
-                    <router-view class="main-body-content" :bodyHeight="bodyHeight"></router-view>
+                    <transition name="fade" mode="out-in">
+                        <router-view :bodyHeight="bodyHeight"></router-view>
+                    </transition>
                 </div>
 
                 <el-footer class="main-footer">Copy</el-footer>
@@ -60,16 +66,31 @@
 <script>
 import _ from "lodash";
 import { setTimeout } from "timers";
+import { navList } from '@manage/router';
+import MenuTree from "./MenuTree";
 
 export default {
     name: "Layout",
+    components: {
+        MenuTree
+    },
+    // props: {
+    //     menu: {
+    //         type: Array,
+    //         default: []
+    //     }
+    // },
+
     data() {
         return {
-            bodyHeight: 500
+            bodyHeight: 500,
+            menu: navList
         };
     },
 
     mounted() {
+        // console.log(this.menu);
+
         const that = this,
             resize = () => {
                 that.bodyHeight = that.$refs.mainBody.offsetHeight;
@@ -133,8 +154,12 @@ export default {
         position: relative;
 
         .main-header,
-        .main-body {
+        .main-body,
+        .main-footer {
             padding: 20px;
+            position: absolute;
+            left: 0;
+            right: 0;
         }
 
         .main-header {
@@ -146,15 +171,11 @@ export default {
             overflow: hidden;
             top: 55px;
             bottom: 40px;
-            left: 0;
-            right: 0;
         }
 
         .main-footer {
-            position: absolute;
+            padding: 0;
             bottom: 0;
-            left: 0;
-            right: 0;
             line-height: 40px;
             height: 40px !important;
             text-align: center;

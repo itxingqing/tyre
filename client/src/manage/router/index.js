@@ -1,12 +1,15 @@
 import Layout from '@manage/component/Layout';
 import Router from 'vue-router';
+// import _ from 'lodash';
 
+//指定name，组织数据方便
 const routes = [{
     //登陆
     path: '/login',
     component: () =>
         import('@manage/page/login'),
     meta: {
+        name: '登录',
         checkAuth: false
     }
 }, {
@@ -23,12 +26,19 @@ const routes = [{
             path: 'banner',
             component: () =>
                 import('@manage/page/banner/index'),
-                // component: function(resolve) {
-                //     require(['@manage/page/banner/index'], resolve);
-                // },
             meta: {
                 name: '封面设置',
-            }
+                icon: "clone"
+            },
+
+            // children: [{
+            //     path: '/test',
+            //     component: () =>
+            //         import('@manage/page/login'),
+            //     meta: {
+            //         name: '测试',
+            //     }
+            // }, ]
         },
         {
             path: 'type',
@@ -36,6 +46,7 @@ const routes = [{
                 import('@manage/page/type/index'),
             meta: {
                 name: '分类管理',
+                icon: "list-alt"
             }
         },
         {
@@ -44,49 +55,111 @@ const routes = [{
                 import('@manage/page/product/index'),
             meta: {
                 name: '产品管理',
+                icon: "store"
             }
         }
     ]
 }];
 
-const router = new Router({
-    routes
-});
-
-// const navList = [];
-function genRoute(arr, paths, parent) {
+function genRoute(arr, paths, prefix) {
     var navList = [],
         paths = paths || [],
-        parent = parent || {
-            url: ''
-        };
+        prefix = prefix || '';
+
+    // console.log(arr);
 
     arr.forEach(item => {
+        var url = prefix + item.path;
+
+        //登录页面不计算
+        if (url == '/login') {
+            return;
+        }
 
         if (item.children) {
-            var pitem = {
-                parent: true,
-                url: parent.url + item.path,
-                name: item.name,
-                paths: [...paths, item.name]
-            };
 
-            navList.push(pitem);
+            if (item.redirect) {
+                navList.push(...genRoute(item.children, [], url));
 
-            genRoute(item.children, pitem.paths, pitem);
+            } else {
+                var pitem = {
+                        parent: true,
+                        url: url,
+                        name: item.meta.name,
+                        icon: item.meta.icon,
+                        // paths: [...paths, item.meta.name]
+                    },
+                    prePath = [
+                        ...paths,
+                        {
+                            name: item.meta.name,
+                            url: url
+                        }
+                    ];
+
+                item.meta.paths = [...paths, item.meta.name]
+
+                navList.push(pitem);
+                pitem.children = genRoute(item.children, prePath, url);
+            }
+
         } else {
+            item.meta.paths = [...paths, {
+                name: item.meta.name
+            }]
+
             navList.push({
-                url: parent.url + item.path,
+                url: url,
                 name: item.meta.name,
-                paths: [...paths, item.name]
+                icon: item.meta.icon,
+                // paths: [...paths, {
+                //     name: item.meta.name
+                // }]
             })
         }
     });
+
+    return navList;
 }
 
 const navList = genRoute(routes);
 
+// //生成2级目录，因为router-view只有两级, 多层使用的可以忽略，针对后台系统
+// function genSecondRoutes(arr, second, prefix) {
+//     var routes = [],
+//         prefix = prefix || '';
+
+//     arr.forEach(item => {
+//         var url = prefix + item.path;
+
+//         item.path = url;
+
+//         if (item.children) {
+
+//             if (!second) {
+//                 routes.push(item);
+//             }
+
+//             // console.log('*******************');
+//             // console.log(item);
+
+//             genRoute(item.children, item.children || [], url);
+
+//         } else {
+//             second ? second.push(item) : routes.push(item);
+//         }
+//     });
+
+//     return routes;
+// }
+
+
+const router = new Router({
+    routes
+});
+
 export {
     router,
-    navList
+    navList,
+    // genRoute
 }

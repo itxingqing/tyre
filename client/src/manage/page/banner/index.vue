@@ -1,7 +1,6 @@
 <template>
     <div>
         sdfsfsadf
-
     </div>
 
 </template>

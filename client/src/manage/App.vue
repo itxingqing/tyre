@@ -5,8 +5,14 @@
 <script>
 import Layout from "@manage/component/Layout";
 
+// console.log(navList);
+
 export default {
     name: "App",
+    data(){
+        return {
+        }
+    }
 };
 </script>
 
