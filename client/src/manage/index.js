@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import App from './App';
-import VueRouter from 'vue-router';
+// import VueRouter from 'vue-router';
 import { router } from './router';
 // import store from './store';
 import ElementUI from 'element-ui';
@@ -15,7 +15,7 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.config.productionTip = false;
 //fontawesom---
 
-Vue.use(VueRouter);
+// Vue.use(VueRouter);
 Vue.use(ElementUI);
 
 new Vue({

@@ -65,39 +65,30 @@
 
 <script>
 import _ from "lodash";
-import { setTimeout } from "timers";
-import { navList } from '@manage/router';
 import MenuTree from "./MenuTree";
+import { menu } from '@manage/router';
 
 export default {
     name: "Layout",
     components: {
         MenuTree
     },
-    // props: {
-    //     menu: {
-    //         type: Array,
-    //         default: []
-    //     }
-    // },
 
     data() {
         return {
             bodyHeight: 500,
-            menu: navList
+            menu: menu
         };
     },
 
     mounted() {
-        // console.log(this.menu);
-
         const that = this,
             resize = () => {
                 that.bodyHeight = that.$refs.mainBody.offsetHeight;
             };
 
         setTimeout(resize, 0);
-
+        
         window.onresize = _.debounce(resize, 300);
     }
 };

@@ -51,7 +51,7 @@ export default {
         padding: 35px 15px;
         background-color: white;
         border: 1px solid #d2cece;
-        border-radius: 4px;
+        border-radius: 6px;
         max-width: 350px;
 
         input,

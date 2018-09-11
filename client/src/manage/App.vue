@@ -3,14 +3,14 @@
 </template>
 
 <script>
-import Layout from "@manage/component/Layout";
-
-// console.log(navList);
+// import Layout from "@manage/component/Layout";
+// import { menu } from '@manage/router';
 
 export default {
     name: "App",
     data(){
         return {
+            // menu: menu
         }
     }
 };

@@ -1,6 +1,8 @@
-import Layout from '@manage/component/Layout';
-import Router from 'vue-router';
+import Vue from 'vue';
+import VueRouter from 'vue-router';
 // import _ from 'lodash';
+
+Vue.use(VueRouter);
 
 //指定name，组织数据方便
 const routes = [{
@@ -14,7 +16,7 @@ const routes = [{
     }
 }, {
     path: '/',
-    component: Layout,
+    component: () => import('@manage/component/Layout'),
     redirect: '/banner',
     meta: {
         name: '首页',
@@ -22,28 +24,20 @@ const routes = [{
     },
 
     //可以component的用page属性，指定router-view的name
+    //只支持一个children，不然显示不聊
     children: [{
             path: 'banner',
             component: () =>
-                import('@manage/page/banner/index'),
+                import('@manage/page/banner/Index'),
             meta: {
                 name: '封面设置',
                 icon: "clone"
             },
-
-            // children: [{
-            //     path: '/test',
-            //     component: () =>
-            //         import('@manage/page/login'),
-            //     meta: {
-            //         name: '测试',
-            //     }
-            // }, ]
         },
         {
             path: 'type',
             component: () =>
-                import('@manage/page/type/index'),
+                import('@manage/page/type/Index'),
             meta: {
                 name: '分类管理',
                 icon: "list-alt"
@@ -52,7 +46,7 @@ const routes = [{
         {
             path: 'product',
             component: () =>
-                import('@manage/page/product/index'),
+                import('@manage/page/product/Index'),
             meta: {
                 name: '产品管理',
                 icon: "store"
@@ -62,7 +56,7 @@ const routes = [{
 }];
 
 function genRoute(arr, paths, prefix) {
-    var navList = [],
+    var menu = [],
         paths = paths || [],
         prefix = prefix || '';
 
@@ -79,7 +73,7 @@ function genRoute(arr, paths, prefix) {
         if (item.children) {
 
             if (item.redirect) {
-                navList.push(...genRoute(item.children, [], url));
+                menu.push(...genRoute(item.children, [], url));
 
             } else {
                 var pitem = {
@@ -99,7 +93,7 @@ function genRoute(arr, paths, prefix) {
 
                 item.meta.paths = [...paths, item.meta.name]
 
-                navList.push(pitem);
+                menu.push(pitem);
                 pitem.children = genRoute(item.children, prePath, url);
             }
 
@@ -108,7 +102,7 @@ function genRoute(arr, paths, prefix) {
                 name: item.meta.name
             }]
 
-            navList.push({
+            menu.push({
                 url: url,
                 name: item.meta.name,
                 icon: item.meta.icon,
@@ -119,47 +113,17 @@ function genRoute(arr, paths, prefix) {
         }
     });
 
-    return navList;
+    return menu;
 }
 
-const navList = genRoute(routes);
+const menu = genRoute(routes);
 
-// //生成2级目录，因为router-view只有两级, 多层使用的可以忽略，针对后台系统
-// function genSecondRoutes(arr, second, prefix) {
-//     var routes = [],
-//         prefix = prefix || '';
-
-//     arr.forEach(item => {
-//         var url = prefix + item.path;
-
-//         item.path = url;
-
-//         if (item.children) {
-
-//             if (!second) {
-//                 routes.push(item);
-//             }
-
-//             // console.log('*******************');
-//             // console.log(item);
-
-//             genRoute(item.children, item.children || [], url);
-
-//         } else {
-//             second ? second.push(item) : routes.push(item);
-//         }
-//     });
-
-//     return routes;
-// }
-
-
-const router = new Router({
+const router = new VueRouter({
     routes
 });
 
 export {
     router,
-    navList,
+    menu,
     // genRoute
 }
