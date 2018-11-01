@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-upload action="https://jsonplaceholder.typicode.com/posts/"
+        <el-upload action="/api/banner/upload"
         :file-list="files" list-type="picture-card" accept="image/*" :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
             <i class="el-icon-plus"></i>
         </el-upload>

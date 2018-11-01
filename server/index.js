@@ -3,17 +3,17 @@ const path = require('path');
 const static = require('koa-static')
 const views = require('koa-views');
 const helper = require('./utils/helper');
-// const favicon = require('koa-favicon');
+const koaBody = require('koa-body');
+const session = require('koa-session');
+const config = require('./config/base')
 
 //注册全局的helper
 global.helper = helper;
 
 const app = new Koa();
 
-// app.use(favicon('../client/dist/favicon.ico'));
-
 //后面改成nginx映射
-const staticPath =  '../client/dist'
+const staticPath = '../client/dist'
 app.use(static(
     path.join(__dirname, staticPath)
 ))
@@ -22,47 +22,20 @@ app.use(views(path.join(__dirname, './view'), {
     extension: 'ejs'
 }));
 
+app.use(koaBody({
+    multipart: true
+}));
+
+app.keys = ['d415daa5-5cfb-4864-ab73-457e5d478e46'];
+
+app.use(session(config.sessionConfig, app));
+
 helper.autoImportFile([
     path.resolve(__dirname, './api'),
     path.resolve(__dirname, './router')
-
-    // './api',
-    // './router'
-], (fileContent, fileName) => {
+], [], (fileContent, fileName) => {
     app.use(fileContent);
 });
 
-// const autoImportFile = function (app, paths) {
-//     paths.forEach(p => {
-//         var fileDir = path.resolve(__dirname, p),
-//             fileList = fs.readdirSync(fileDir),
-//             dirArr = [];
-
-//         fileList.forEach(item => {
-//             var file = path.resolve(fileDir, item);
-//             stat = fs.statSync(file);
-
-//             if (stat.isDirectory()) {
-//                 dirArr.push(p + '/' + item);
-//             } else if (/\.js$/.test(item)) {
-//                 var mod = require(p + '/' + item);
-//                 app.use(mod);
-//             }
-//         });
-
-//         if (dirArr.length) {
-//             autoImportFile(app, dirArr);
-//         }
-//     });
-// }
-
-// autoImportFile(app, [
-//     './api',
-//     './router'
-// ]);
-
-// app.use(ctx => {
-//     ctx.body = '测试服务起';
-// });
 
 app.listen(8888);

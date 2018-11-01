@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 class helper {
 
@@ -55,7 +56,7 @@ class helper {
      * @param {String} paths 自动引入的目录, 数组
      * @param {Fcunction}} callback 回调方法, 注入两个参数，一个是引入的文件，一个是文件名称
      */
-    static autoImportFile(paths, callback, pathArray) {
+    static autoImportFile(paths, exclude, callback, pathArray) {
         pathArray = pathArray || [];
 
         paths.forEach(p => {
@@ -65,27 +66,72 @@ class helper {
             fileList.forEach(item => {
                 var file = path.resolve(p, item),
                     stat = fs.statSync(file),
-                    filePath = path.join(p, item);
+                    filePath = path.join(p, item),
+                    excludeFound = false;
+
+                exclude.forEach( (exitem) =>{
+                    if(exitem == filePath){
+                        excludeFound = true;
+                    }
+                });
+
+                if(excludeFound){
+                    return false;
+                }
 
                 if (stat.isDirectory()) {
                     dirArr.push(filePath);
                     pathArray.push(item);
 
                 } else if (path.extname(item) == '.js') {
-
                     var fileContent = require(filePath);
                     callback && callback(fileContent, item, pathArray);
                 }
             });
 
             if (dirArr.length) {
-                autoImportFile(dirArr, callback, pathArray);
+                autoImportFile(dirArr, exclude, callback, pathArray);
             }
         });
     }
 
     static getClientPath(){
         return path.resolve(__dirname, '../../client/dist');
+    }
+
+    static sha1(value) {
+        let sha1 = crypto.createHash('sha1');        
+        return sha1.update(value).digest('hex');
+    }
+
+    static warpResponseParams(data, errorCode, message){
+        return {
+            data: data || [],
+            error: errorCode || '',
+            message: message || ''
+        }
+    }
+
+    static trim(value){
+        if(Object.prototype.toString.call(value) == '[object String]'){
+            value = value.replace(/(^\s*)|(\s*$)/g, "")
+        }
+
+        return value;
+    }
+
+    static authorize(ctx, next){
+        let userInfo = ctx.session.userInfo;
+
+        if(userInfo){
+            ctx._userInfo = userInfo;
+
+            next();
+        }else{
+
+            ctx.body = helper.warpResponseParams([], 403, '未登录.');
+            return;
+        }
     }
 }
 

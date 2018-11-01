@@ -11,8 +11,8 @@ create table banner
 (
 	id serial primary key,
 	img varchar(128) not null default '',
-  ct_time timestamp default CURRENT_TIMESTAMP not null,
-  mfy_time timestamp default CURRENT_TIMESTAMP not null
+  	ct_time timestamp default CURRENT_TIMESTAMP not null,
+  	mfy_time timestamp default CURRENT_TIMESTAMP not null
 );
 
 -- -----------------------------------------------------

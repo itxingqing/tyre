@@ -1,11 +1,20 @@
-const { bannerDal } = require('../dal/index');
+const {
+    bannerDal
+} = require('../dal/index');
 
 class BannerBll {
 
-    async findAll(){
-        var data = await bannerDal.findAll();
+    async findAll() {
+        return await bannerDal.findAll();
+    }
 
-        return data;
+    async delete(id) {
+        return !!(await bannerDal.delete(id));
+    }
+
+    async add(img_url) {
+        return await bannerDal.add(img_url);
+
     }
 }
 

@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import TabelBase from '@manage/component/TabelBase'
+import TabelBase from '@manage/page/base/TabelBase'
 import Add from "./Add";
 import Edit from "./Edit";
 export default {

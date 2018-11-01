@@ -63,7 +63,7 @@ module.exports = {
     // context: sourcePath,
     resolve: {
         //一定要添加，不然无法找到vue文件
-        extensions: ['.js', '.vue', '.json', 'less'],
+        extensions: ['.js', '.vue', '.json', '.less'],
         alias: {
             'vue': 'vue/dist/vue.js',
             '@manage': `${managePath}`

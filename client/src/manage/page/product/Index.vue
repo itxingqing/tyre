@@ -3,15 +3,13 @@
         <!-- <div>{{tabelHeight}}</div> -->
         <el-row class="table-container">
             <el-table border stripe :data="tData" style="width: 100%" :height="tabelHeight">
-                <el-table-column prop="date" label="类型">
+                <el-table-column prop="p_name" label="产品名称">
                 </el-table-column>
-                <el-table-column prop="name" label="中文名称">
-                </el-table-column>
-                <el-table-column prop="name" label="英文名称">
+                <el-table-column prop="ty_name" label="类型名称">
                 </el-table-column>
             </el-table>
         </el-row>
-
+        
         <el-row class="pager">
             <el-pagination background layout="prev, pager, next" :total="1000">
             </el-pagination>
@@ -34,7 +32,7 @@
 </template>
 
 <script>
-import TabelBase from '@manage/component/TabelBase'
+import TabelBase from '@manage/page/base/TabelBase'
 import Add from "./Add";
 import Edit from "./Edit";
 

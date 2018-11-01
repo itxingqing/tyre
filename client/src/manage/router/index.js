@@ -16,7 +16,7 @@ const routes = [{
     }
 }, {
     path: '/',
-    component: () => import('@manage/component/Layout'),
+    component: () => import('@manage/page/layout/Layout'),
     redirect: '/banner',
     meta: {
         name: '首页',

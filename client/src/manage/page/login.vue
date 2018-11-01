@@ -2,7 +2,7 @@
     <div class="login-container">
 
         <form class="login-form">
-            <div class="login-title">系统登录</div>
+            <div class="login-title">轮胎管理系统</div>
             <el-input v-model="username" placeholder="请输入用户名"></el-input>
             <el-input v-model="password" type="password" placeholder="请输入用户密码"></el-input>
             <el-button type="primary" :loading="loading" @click="submitHandler">登录</el-button>
@@ -42,6 +42,8 @@ export default {
     left: 0;
     right: 0;
     background-color: #12afe3;
+    background-image: url(../image/manage_bg.jpg);
+    background-size: 100% 100%;
 
     .login-form {
         position: absolute;

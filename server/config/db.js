@@ -5,6 +5,7 @@ module.exports = {
     host: 'localhost',
     port: 5432,
     dialect: 'postgres',
+    logging: true,
     //连接池    
     pool: {
         min: 0,

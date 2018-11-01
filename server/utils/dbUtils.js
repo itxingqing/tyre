@@ -8,6 +8,7 @@ module.exports = new Sequlize(
         port: config.port,
         dialect: config.dialect,
         pool: config.pool,
-        operatorsAliases: false        
+        logging: config.logging,
+        operatorsAliases: false
     }
 );

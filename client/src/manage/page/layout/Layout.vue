@@ -65,7 +65,7 @@
 
 <script>
 import _ from "lodash";
-import MenuTree from "./MenuTree";
+import MenuTree from "@manage/component/menutree/MenuTree";
 import { menu } from '@manage/router';
 
 export default {
@@ -125,7 +125,7 @@ export default {
     }
 
     .user-image {
-        background-image: url(../image/user_image.png);
+        background-image: url(../../image/user_image.png);
         height: 40px;
         width: 40px;
         vertical-align: middle;

@@ -1,13 +1,29 @@
-const { banner } = require('../entity/index');
+const {
+    banner
+} = require('../entity/index');
 
 class BannerDal {
 
     async findAll() {
-        
-        banner.findAll().then(data => {
-            console.log(data)
-        })
-        return "";
+        return await banner.findAll();
+    }
+
+    async delete(id) {
+        return await banner.destroy({
+            where: {
+                id: id
+            }
+        });
+    }
+
+    async add(img_url) {
+        let {
+            dataValues
+        } = await banner.create({
+            img: img_url
+        });
+
+        return dataValues;
     }
 }
 

@@ -1,13 +1,26 @@
-const { users } = require('../entity/index');
+const {
+    users
+} = require('../entity/index');
 
 class UsersDal {
 
-    async findAll() {
-        
-        users.findAll().then(data => {
-            console.log(data)
+    async find(uname) {
+        return await users.find({
+            where: {
+                uname: uname
+            }
+        });
+    }
+
+    async change_password(id, password) {
+
+        return await users.update({
+            password: password
+        }, {
+            where: {
+                id: id
+            }
         })
-        return "";
     }
 }
 

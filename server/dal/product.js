@@ -1,13 +1,44 @@
-const { product } = require('../entity/index');
+const {
+    product
+} = require('../entity/index');
 
 class ProductDal {
 
-    async findAll() {
-        
-        product.findAll().then(data => {
-            console.log(data)
+    async findAll(offset, limit) {
+        return await product.findAll({
+            offset: offset,
+            limit: limit
+        });
+    }
+
+    async findByID(id) {
+        return await product.find({
+            where: {
+                id: id
+            }
         })
-        return "";
+    }
+
+    async add(obj) {
+        return await product.create(obj)
+    }
+
+    async update(id, obj) {
+        return await product.update({
+            obj
+        }, {
+            where: {
+                id: id
+            }
+        })
+    }
+
+    async delete(id) {
+        return await product.destroy({
+            where: {
+                id: id
+            }
+        });
     }
 }
 
