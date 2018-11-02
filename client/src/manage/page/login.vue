@@ -1,12 +1,12 @@
 <template>
     <div class="login-container">
 
-        <form class="login-form">
+        <el-form ref="form" :model="form" class="login-form">
             <div class="login-title">轮胎管理系统</div>
-            <el-input v-model="username" placeholder="请输入用户名"></el-input>
-            <el-input v-model="password" type="password" placeholder="请输入用户密码"></el-input>
+            <el-input v-model.trim="form.username" placeholder="请输入用户名" auto-complete="off"></el-input>
+            <el-input @keyup.native.enter="submitHandler" v-model.trim="form.password" type="password" placeholder="请输入用户密码" autocomplete="off"></el-input>
             <el-button type="primary" :loading="loading" @click="submitHandler">登录</el-button>
-        </form>
+        </el-form>
     </div>
 </template>
 
@@ -15,21 +15,55 @@ export default {
     name: "login",
     data() {
         return {
-            username: "",
-            password: "",
-            loading: false,
+            form: {
+                username: "",
+                password: ""
+            },
 
-            error: {
-                open: false,
-                title: "错误",
-                message: "错误信息"
-            }
+            loading: false
         };
     },
 
     methods: {
         submitHandler() {
-            this.$message.error('用户或密码错误,请重试.');
+            let that = this;
+
+            if (!that.form.username) {
+                this.$message.error("请输入用户名.");
+                return;
+            }
+
+            if (!that.form.password) {
+                this.$message.error("请输入密码.");
+                return;
+            }
+
+            that.loading = true;
+
+            that.$api.users
+                .login(that.form)
+                .then(res => {
+                    if (res.error == 0) {
+                        this.$message({
+                            message: "登录成功",
+                            type: "success",
+                            duration: 800
+                        });
+
+                        that.$store.commit('setUserInfo', res.data);
+
+                        setTimeout(() => {
+                            that.$router.push("/banner");
+                        }, 1200);
+                    } else {
+                        that.$message.error("用户或密码错误,请重试.");
+                        that.loading = false;
+                    }
+                })
+                .catch(res => {
+                    that.$message.error("用户或密码错误,请重试.");
+                    that.loading = false;
+                });
         }
     }
 };

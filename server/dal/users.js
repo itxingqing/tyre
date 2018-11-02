@@ -7,18 +7,26 @@ class UsersDal {
     async find(uname) {
         return await users.find({
             where: {
-                uname: uname
+                uname
             }
         });
     }
 
-    async change_password(id, password) {
+    async findByID(id) {
+        return await users.find({
+            where: {
+                id
+            }
+        });
+    }
+
+    async change_password(id, passwd) {
 
         return await users.update({
-            password: password
+            passwd
         }, {
             where: {
-                id: id
+                id
             }
         })
     }

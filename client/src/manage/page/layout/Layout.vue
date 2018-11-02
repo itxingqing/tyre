@@ -12,11 +12,11 @@
                 <el-dropdown class="dropdown-link">
                     <span>
                         <span class="inline-block bg-cover user-image"></span>
-                        <span class="inline-block">用户名</span>
+                        <span class="inline-block">{{userInfo.uname}}</span>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item>修改密码</el-dropdown-item>
-                        <el-dropdown-item>退出登录</el-dropdown-item>
+                        <el-dropdown-item @click.native.stop="changePasswordVisable = true">修改密码</el-dropdown-item>
+                        <el-dropdown-item @click.native.stop="logout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
@@ -41,13 +41,6 @@
                                 <el-breadcrumb-item :key="index">{{item.name}}</el-breadcrumb-item>
                             </template>
                         </template>
-
-                        <!-- <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                        <el-breadcrumb-item>
-                            <a href="/">活动管理</a>
-                        </el-breadcrumb-item>
-                        <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-                        <el-breadcrumb-item>活动详情</el-breadcrumb-item> -->
                     </el-breadcrumb>
                 </div>
 
@@ -60,13 +53,33 @@
                 <el-footer class="main-footer">Copy</el-footer>
             </el-main>
         </el-container>
+
+        <el-dialog title="修改密码" :visible.sync="changePasswordVisable" :close-on-click-modal="false" closed="resetForm">
+            <el-form :model="changePwdForm" ref="changePwdForm" label-width="100px" :rules="rules">
+                <el-form-item label="旧密码" prop="passRequire">
+                    <el-input v-model.trim="changePwdForm.oldPass" type="password" autocomplete="off" placeholder="请输入密码"></el-input>
+                </el-form-item>
+                <el-form-item label="新密码" prop="passRequire">
+                    <el-input v-model.trim="changePwdForm.newPass" type="password" autocomplete="off" placeholder="请输入新密码"></el-input>
+                </el-form-item>
+                <el-form-item label="请确认密码" prop="passRequire">
+                    <el-input v-model.trim="changePwdForm.newPassRe" type="password" autocomplete="off" placeholder="请再次输入新密码"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="changePasswordVisable = false">取 消</el-button>
+                <el-button :loading="changLoading" type="primary" @click="resetForm">确 定</el-button>
+            </div>
+        </el-dialog>
+
     </el-container>
 </template>
 
 <script>
 import _ from "lodash";
 import MenuTree from "@manage/component/menutree/MenuTree";
-import { menu } from '@manage/router';
+import { menu } from "@manage/router";
+import { mapGetters } from "vuex";
 
 export default {
     name: "Layout",
@@ -77,8 +90,36 @@ export default {
     data() {
         return {
             bodyHeight: 500,
-            menu: menu
+            menu: menu,
+            changePasswordVisable: false,
+
+            changePwdForm: {
+                oldPass: "",
+                newPass: "",
+                newPassRe: ""
+            },
+
+            rules: {
+                passRequire: [
+                    {
+                        required: true,
+                        message: "请填写所需要的密码",
+                        trigger: "blur"
+                    },
+                    {
+                        min: 6,
+                        message: "长度最少6个字符",
+                        trigger: "blur"
+                    }
+                ]
+            },
+
+            changLoading: false
         };
+    },
+
+    computed: {
+        ...mapGetters(["userInfo"])
     },
 
     mounted() {
@@ -88,8 +129,66 @@ export default {
             };
 
         setTimeout(resize, 0);
-        
+
         window.onresize = _.debounce(resize, 300);
+    },
+
+    methods: {
+        changePassword() {
+            let that = this;
+
+            that.$refs[formName].validate(valid => {
+                that.changLoading = true;
+
+                that.$api.users
+                    .changePassword(that.changePwdForm)
+                    .then(res => {
+                        if (res.error == 0) {
+                            that.$message({
+                                message: "修改成功.",
+                                type: "success",
+                                duration: 800
+                            });                            
+
+                            // that.changePwdForm.oldPass = "";
+                            // that.changePwdForm.newPass = "";
+                            // that.changePwdForm.newPassRe = "";
+
+                            // this.$refs["changePwdForm"].resetFields();
+                            that.resetForm();
+                        } else {
+                            that.$message.error(res.message);
+                        }
+
+                        that.changLoading = false;
+                    })
+                    .catch(res => {
+                        that.$message.error("修改失败，请重试.");
+
+                        that.changLoading = false;
+                    });
+            });
+        },
+
+        logout() {
+            let that = this;
+
+            that.$api.users
+                .logout()
+                .then(res => {
+                    that.$store.commit("clearUserInfo");
+                    that.$router.replace("/login");
+                })
+                .catch(res => {
+                    that.$message.error("退出失败,请重试.");
+                });
+        },
+
+        resetForm(){
+            this.$refs["changePwdForm"].resetFields();
+
+            that.changePasswordVisable = false;
+        }
     }
 };
 </script>

@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: '', // api的base_url
-    timeout: 6000 // 请求超时时间
+    baseURL: '/api', // api的base_url
+    timeout: 600000 // 请求超时时间
 
 })
 // request拦截器

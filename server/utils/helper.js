@@ -107,7 +107,7 @@ class helper {
     static warpResponseParams(data, errorCode, message){
         return {
             data: data || [],
-            error: errorCode || '',
+            error: (errorCode !== null? errorCode : 0),
             message: message || ''
         }
     }
@@ -120,17 +120,17 @@ class helper {
         return value;
     }
 
-    static authorize(ctx, next){
+    static async authorize(ctx, next){
         let userInfo = ctx.session.userInfo;
 
         if(userInfo){
             ctx._userInfo = userInfo;
 
-            next();
+            //https://github.com/alexmingoia/koa-router/issues/358
+            //必须添加await，不然后面的代码会运行不下去
+            await next();
         }else{
-
             ctx.body = helper.warpResponseParams([], 403, '未登录.');
-            return;
         }
     }
 }

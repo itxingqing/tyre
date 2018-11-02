@@ -1,10 +1,10 @@
-import * as user from './user'
+import * as users from './users'
 import * as type from './type'
 import * as product from './product'
 import * as banner from './banner'
 
 const apis = {
-    user,
+    users,
     type,
     product,
     banner

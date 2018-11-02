@@ -13,7 +13,7 @@ module.exports = {
             primaryKey: true,
             autoIncrement: true
         },
-        uanme: {
+        uname: {
             type: STRING(64),
             allowNull: false
         },

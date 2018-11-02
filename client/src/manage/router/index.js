@@ -1,6 +1,9 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-// import _ from 'lodash';
+//因为全局路由守卫不能获取this，这里直接使用方法来获取是否登录
+import {
+    getUserInfo
+} from '../api/users';
 
 Vue.use(VueRouter);
 
@@ -122,8 +125,27 @@ const router = new VueRouter({
     routes
 });
 
+router.beforeEach((to, from, next) => {
+
+    let toPath = to.path;
+
+    if (toPath == '/login') {
+        next();
+    } else {
+        getUserInfo().then((res) => {
+            if (res.error == 0) {
+                next();
+            } else {
+                router.replace('/login');
+            }
+
+        }).catch((res) => {
+            router.replace('/login');
+        });
+    }
+});
+
 export {
     router,
-    menu,
-    // genRoute
+    menu
 }

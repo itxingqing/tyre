@@ -1,4 +1,6 @@
-const { usersBll } = require('../bll/index');
+const {
+    usersBll
+} = require('../bll/index');
 const Router = require('koa-router');
 const router = new Router({
     prefix: '/api/users'
@@ -16,50 +18,56 @@ const router = new Router({
 //修改失败507
 //删除失败508
 
-router.post('/login', async (ctx, next) => {    
+router.post('/login', async (ctx, next) => {
     let body = ctx.request.body,
-        result = await usersBll.login(body.uname, body.password);
+        result = await usersBll.login(helper.trim(body.username), body.password);
 
-    if(result.pass){
+    if (result.pass) {
         ctx.session.userInfo = {
             id: result.id,
-            uname: body.uname
+            uname: body.username
         }
 
-        ctx.body = helper.warpResponseParams([], 0, '登录成功.');
-    }else{
+        ctx.body = helper.warpResponseParams(ctx.session.userInfo, 0, '登录成功.');
+    } else {
         ctx.body = helper.warpResponseParams([], 500, '账户或密码错误.');
     }
 });
 
-router.post('/loginout', async (ctx, next) => {    
-    ctx.body.__userInfo__ = ctx.session.userInfo = null;
+router.post('/logout', async (ctx, next) => {
+    ctx._userInfo = ctx.session.userInfo = null;
 
-    ctx.body = helper.warpResponseParams([], 0, '退出成功.');    
+    ctx.body = helper.warpResponseParams([], 0, '退出成功.');
 });
 
 //从这里开始的方法都是需要登录权限
 router.use(helper.authorize);
 
-router.post('/change_password', async (ctx, next) => {
+router.post('/change_password',async (ctx, next) => {
     let body = ctx.request.body,
-        password = helper.trim(body.password);
+        oldPassword = body.oldPass,
+        newPassword = body.newPass,
+        newPasswordRe = body.newPassRe;
 
-    if(password){
-        let rs = await usersBll.change_password(ctx._userInfo.id, password);
-
-        if(rs){
-            ctx.body = helper.warpResponseParams([], 0, '修改成功.');
-        }else{
-            ctx.body = helper.warpResponseParams([], 507, '修改失败，请重试.');
-        }
-        
-    }else{
-        ctx.body = helper.warpResponseParams([], 500, '参数错误.');
+    if (!oldPassword || !newPassword || !newPasswordRe) {
+        ctx.body = helper.warpResponseParams([], 500, '参数错误，请重试.');
+        return;
     }
-    
+
+    if (newPassword != newPasswordRe) {
+        ctx.body = helper.warpResponseParams([], 507, '新密码和重新输入的密码不一致.');
+        return;
+    }
+
+    let message = await usersBll.change_password(ctx._userInfo.id, oldPassword, newPassword);
+
+    ctx.body = helper.warpResponseParams([], (message == '' ? 0 : 507), message);
+
 });
 
-
+//获取用户信息
+router.get('/get_userInfo', async (ctx, next) => {
+    ctx.body = helper.warpResponseParams(ctx._userInfo, 0, '');
+});
 
 module.exports = router.routes();
