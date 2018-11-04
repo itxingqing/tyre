@@ -5,7 +5,13 @@ const {
 class BannerDal {
 
     async findAll() {
-        return await banner.findAll();
+        return await banner.findAll({
+            //设置别名
+            attributes: ['id', ['img', 'url']],
+            order: [
+                ['ct_time', 'asc']
+            ]
+        });
     }
 
     async delete(id) {

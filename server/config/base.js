@@ -9,7 +9,7 @@ module.exports = {
         /** (number || 'session') maxAge in ms (default is 1 days) */
         /** 'session' will result in a cookie that expires when session/browser is closed */
         /** Warning: If a session cookie is stolen, this cookie will never expire */
-        maxAge: 86400000,
+        maxAge: 10800000,
         autoCommit: true,
         /** （boolean）自动提交头文件（默认为true） */
         overwrite: true,

@@ -4,7 +4,7 @@ import request from '../common/request';
 //获取封面的列表
 export function get(data) {
     return request({
-        url: '/banner/get',
+        url: '/banner/list',
         method: 'get',
         data: data
     })

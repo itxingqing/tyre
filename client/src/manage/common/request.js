@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { router } from '../router';
 
 const instance = axios.create({
     baseURL: '/api', // api的base_url
@@ -23,10 +24,19 @@ instance.interceptors.response.use(
     response => {
         const resp = response.data
         if (response.status === 200) {
-            return resp
+
+            if (resp.error == '403') {
+
+                router.replace({
+                    path: '/login',
+                    query: {
+                        redirect: router.currentRoute.fullPath
+                    } //登录成功后跳入浏览的当前页面
+                })
+            }
         }
 
-        return resp
+        return resp;
     },
     error => {
         return Promise.reject(error);

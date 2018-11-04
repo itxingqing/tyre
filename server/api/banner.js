@@ -27,12 +27,13 @@ router.use(helper.authorize);
 
 //获取上传图片的列表
 router.get('/list', async (ctx, next) => {
-    ctx.body = await bannerBll.findAll();
+    let list = await bannerBll.findAll();
+    ctx.body = helper.warpResponseParams(list, 0, '');
 });
 
 //删除图片
-router.delete('/:id', async (ctx, next) => {
-    let id = ctx.params.id;
+router.post('/del', async (ctx, next) => {
+    let id = ctx.request.body.id;
 
     if (!id) {
         ctx.body = helper.warpResponseParams([], 500, '参数错误');
@@ -77,6 +78,10 @@ router.post('/upload', async (ctx, next) => {
         //save file
         let result = await bannerBll.add(remoteUrl);
 
+        result.url = result.img;
+
+        delete result.img;
+
         ctx.body = helper.warpResponseParams(result, 0, '');
 
     } catch (e) {
@@ -84,6 +89,5 @@ router.post('/upload', async (ctx, next) => {
     }
 
 });
-
 
 module.exports = router.routes();

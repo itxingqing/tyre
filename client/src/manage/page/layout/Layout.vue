@@ -54,21 +54,21 @@
             </el-main>
         </el-container>
 
-        <el-dialog title="修改密码" :visible.sync="changePasswordVisable" :close-on-click-modal="false" closed="resetForm">
-            <el-form :model="changePwdForm" ref="changePwdForm" label-width="100px" :rules="rules">
-                <el-form-item label="旧密码" prop="passRequire">
-                    <el-input v-model.trim="changePwdForm.oldPass" type="password" autocomplete="off" placeholder="请输入密码"></el-input>
+        <el-dialog class="custom-dialog" title="修改密码" :visible.sync="changePasswordVisable" :close-on-click-modal="false" closed="resetForm">
+            <el-form :model="changePwd" ref="changePwdForm" label-width="100px" :rules="rules">
+                <el-form-item label="旧密码" prop="oldPass">
+                    <el-input v-model="changePwd.oldPass" type="password" autocomplete="off" placeholder="请输入密码"></el-input>
                 </el-form-item>
-                <el-form-item label="新密码" prop="passRequire">
-                    <el-input v-model.trim="changePwdForm.newPass" type="password" autocomplete="off" placeholder="请输入新密码"></el-input>
+                <el-form-item label="新密码" prop="newPass">
+                    <el-input v-model="changePwd.newPass" type="password" autocomplete="off" placeholder="请输入新密码"></el-input>
                 </el-form-item>
-                <el-form-item label="请确认密码" prop="passRequire">
-                    <el-input v-model.trim="changePwdForm.newPassRe" type="password" autocomplete="off" placeholder="请再次输入新密码"></el-input>
+                <el-form-item label="请确认密码" prop="newPassRe">
+                    <el-input v-model="changePwd.newPassRe" type="password" autocomplete="off" placeholder="请再次输入新密码"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="changePasswordVisable = false">取 消</el-button>
-                <el-button :loading="changLoading" type="primary" @click="resetForm">确 定</el-button>
+                <el-button @click="resetForm">取 消</el-button>
+                <el-button :loading="changLoading" type="primary" @click="changePassword">确 定</el-button>
             </div>
         </el-dialog>
 
@@ -80,6 +80,19 @@ import _ from "lodash";
 import MenuTree from "@manage/component/menutree/MenuTree";
 import { menu } from "@manage/router";
 import { mapGetters } from "vuex";
+
+let passRules = [
+    {
+        required: true,
+        message: "请填写所需要的密码",
+        trigger: "blur"
+    },
+    {
+        min: 6,
+        message: "长度最少6个字符",
+        trigger: "blur"
+    }
+];
 
 export default {
     name: "Layout",
@@ -93,25 +106,16 @@ export default {
             menu: menu,
             changePasswordVisable: false,
 
-            changePwdForm: {
+            changePwd: {
                 oldPass: "",
                 newPass: "",
                 newPassRe: ""
             },
 
             rules: {
-                passRequire: [
-                    {
-                        required: true,
-                        message: "请填写所需要的密码",
-                        trigger: "blur"
-                    },
-                    {
-                        min: 6,
-                        message: "长度最少6个字符",
-                        trigger: "blur"
-                    }
-                ]
+                oldPass: passRules,
+                newPass: passRules,
+                newPassRe: passRules
             },
 
             changLoading: false
@@ -137,36 +141,33 @@ export default {
         changePassword() {
             let that = this;
 
-            that.$refs[formName].validate(valid => {
-                that.changLoading = true;
+            that.$refs["changePwdForm"].validate(valid => {
+                if (valid) {
+                    that.changLoading = true;
 
-                that.$api.users
-                    .changePassword(that.changePwdForm)
-                    .then(res => {
-                        if (res.error == 0) {
-                            that.$message({
-                                message: "修改成功.",
-                                type: "success",
-                                duration: 800
-                            });                            
+                    that.$api.users
+                        .changePassword(that.changePwd)
+                        .then(res => {
+                            if (res.error == 0) {
+                                that.$message({
+                                    message: "修改成功.",
+                                    type: "success",
+                                    duration: 800
+                                });
 
-                            // that.changePwdForm.oldPass = "";
-                            // that.changePwdForm.newPass = "";
-                            // that.changePwdForm.newPassRe = "";
+                                that.resetForm();
+                            } else {
+                                that.$message.error(res.message);
+                            }
 
-                            // this.$refs["changePwdForm"].resetFields();
-                            that.resetForm();
-                        } else {
-                            that.$message.error(res.message);
-                        }
+                            that.changLoading = false;
+                        })
+                        .catch(res => {
+                            that.$message.error("修改失败，请重试.");
 
-                        that.changLoading = false;
-                    })
-                    .catch(res => {
-                        that.$message.error("修改失败，请重试.");
-
-                        that.changLoading = false;
-                    });
+                            that.changLoading = false;
+                        });
+                }
             });
         },
 
@@ -184,10 +185,10 @@ export default {
                 });
         },
 
-        resetForm(){
+        resetForm() {
             this.$refs["changePwdForm"].resetFields();
 
-            that.changePasswordVisable = false;
+            this.changePasswordVisable = false;
         }
     }
 };

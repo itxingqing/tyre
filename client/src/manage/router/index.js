@@ -134,12 +134,22 @@ router.beforeEach((to, from, next) => {
     } else {
         getUserInfo().then((res) => {
             if (res.error == 0) {
+                let sessionUserInfo = window.sessionStorage.getItem('_userInfo'),
+                    userInfo = JSON.stringify(res.data);
+
+                if(sessionUserInfo != userInfo){
+                    window.sessionStorage.setItem('_userInfo', userInfo);
+                }
+
                 next();
             } else {
+                window.sessionStorage.removeItem('_userInfo');
                 router.replace('/login');
             }
 
         }).catch((res) => {
+            window.sessionStorage.removeItem('_userInfo');
+
             router.replace('/login');
         });
     }

@@ -13,6 +13,7 @@
 <script>
 export default {
     name: "login",
+
     data() {
         return {
             form: {
@@ -50,10 +51,19 @@ export default {
                             duration: 800
                         });
 
-                        that.$store.commit('setUserInfo', res.data);
+                        that.$store.commit("setUserInfo", res.data);
 
                         setTimeout(() => {
-                            that.$router.push("/banner");
+                            let redirect = decodeURIComponent(
+                                that.$route.query.redirect || "/banner"
+                            );
+
+                            that.$router.push({
+                                //你需要接受路由的参数再跳转
+                                path: redirect
+                            });
+
+                            // that.$router.push("/banner");
                         }, 1200);
                     } else {
                         that.$message.error("用户或密码错误,请重试.");
