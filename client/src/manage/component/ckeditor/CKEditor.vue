@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { guid } from "@common/util";
+import { guid } from "@magCommon/util";
 import CKEDITOR from "CKEDITOR";
 
 export default {

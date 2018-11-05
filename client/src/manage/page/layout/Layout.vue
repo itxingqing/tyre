@@ -54,7 +54,7 @@
             </el-main>
         </el-container>
 
-        <el-dialog class="custom-dialog" title="修改密码" :visible.sync="changePasswordVisable" :close-on-click-modal="false" closed="resetForm">
+        <el-dialog class="custom-dialog" title="修改密码" :visible.sync="changePasswordVisable" :close-on-click-modal="false">
             <el-form :model="changePwd" ref="changePwdForm" label-width="100px" :rules="rules">
                 <el-form-item label="旧密码" prop="oldPass">
                     <el-input v-model="changePwd.oldPass" type="password" autocomplete="off" placeholder="请输入密码"></el-input>

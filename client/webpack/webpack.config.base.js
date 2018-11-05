@@ -60,13 +60,20 @@ module.exports = {
         filename: '[name]/index[hash:4].js',
         chunkFilename: 'manage/chunks/[name][hash:4].js',
     },
+
+    externals: {
+        'CKEDITOR': 'window.CKEDITOR'
+    },
+
     // context: sourcePath,
     resolve: {
         //一定要添加，不然无法找到vue文件
-        extensions: ['.js', '.vue', '.json', '.less'],
+        extensions: ['.js', '.vue', '.json', '.css', '.less'],
         alias: {
             'vue': 'vue/dist/vue.js',
-            '@manage': `${managePath}`
+            '@manage': `${managePath}`,
+            '@magCommon': `${managePath}/common`,
+            '@magComponent': `${managePath}/component`
         }
     },
     optimization: {

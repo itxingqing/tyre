@@ -14,6 +14,14 @@ class BannerDal {
         });
     }
 
+    async findByID(id) {
+        return await banner.find({
+            where: {
+                id
+            }
+        })
+    }
+
     async delete(id) {
         return await banner.destroy({
             where: {
@@ -25,9 +33,7 @@ class BannerDal {
     async add(img_url) {
         let {
             dataValues
-        } = await banner.create({
-            img: img_url
-        });
+        } = await banner.create(obj);
 
         return dataValues;
     }

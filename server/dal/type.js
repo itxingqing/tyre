@@ -2,10 +2,13 @@ const { type } = require('../entity/index');
 
 class TypeDal {
 
-    async findAll(offset, limit) {
-        return await type.findAll({
+    async findByPage(offset, limit) {
+        return await type.findAndCountAll({
             offset: offset,
-            limit: limit
+            limit: limit,
+            order: [
+                ['ct_time', 'asc']
+            ]
         });
     }
 
@@ -13,6 +16,14 @@ class TypeDal {
         return await type.find({
             where: {
                 id: id
+            }
+        });
+    }
+
+    async findByTypeName(ty_name){
+        return await type.find({
+            where: {
+                ty_name
             }
         })
     }
@@ -22,9 +33,7 @@ class TypeDal {
     }
 
     async update(id, obj) {
-        return await type.update({
-            obj
-        }, {
+        return await type.update(obj, {
             where: {
                 id: id
             }

@@ -26,6 +26,7 @@ instance.interceptors.response.use(
         if (response.status === 200) {
 
             if (resp.error == '403') {
+                that.$message.error("未登录.");
 
                 router.replace({
                     path: '/login',

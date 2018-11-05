@@ -4,10 +4,13 @@ const {
 
 class ProductDal {
 
-    async findAll(offset, limit) {
-        return await product.findAll({
+    async findByPage(offset, limit) {
+        return await product.findAndCountAll({
             offset: offset,
-            limit: limit
+            limit: limit,
+            order: [
+                ['ct_time', 'asc']
+            ]
         });
     }
 
@@ -16,7 +19,7 @@ class ProductDal {
             where: {
                 id: id
             }
-        })
+        });
     }
 
     async add(obj) {

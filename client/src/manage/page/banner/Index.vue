@@ -31,8 +31,6 @@ export default {
             .then(res => {
                 if (res.error == 0) {
                     that.files = res.data;
-                } else {
-                    that.$message.error("获取文件列表失败，请刷新后重试.");
                 }
             })
             .catch(res => {
@@ -47,14 +45,14 @@ export default {
             if (res.error == 0) {
                 lastFile.url = res.data.url;
                 lastFile.id = res.data.id;
-            } else {
+            } else if (res.error == 504) {
                 fileList.splice(fileList.length - 1, 1);
 
                 that.$message.error("上传失败，请刷新后重试.");
             }
         },
 
-        uploadError(err, file, fileList){
+        uploadError(err, file, fileList) {
             that.$message.error("上传失败，请刷新后重试.");
         },
 
@@ -78,7 +76,7 @@ export default {
                                 });
 
                                 resolve("");
-                            } else {
+                            } else if (res.error == 508) {
                                 reject("");
 
                                 that.$message.error("删除失败，请刷新后重试.");

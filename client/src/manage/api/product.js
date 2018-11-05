@@ -3,9 +3,18 @@ import request from '../common/request';
 //获取产品列表
 export function get(data) {
     return request({
-        url: '/product/get',
+        url: '/product/list',
         method: 'get',
-        data: data
+        params: data
+    })
+}
+
+//根据id获取类型
+export function getByID(data) {
+    return request({
+        url: '/product/get_by_id',
+        method: 'get',
+        params: data
     })
 }
 

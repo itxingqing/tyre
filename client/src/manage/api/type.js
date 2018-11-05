@@ -3,9 +3,18 @@ import request from '../common/request';
 //获取类型列表
 export function get(data) {
     return request({
-        url: '/type/get',
+        url: '/type/list',
         method: 'get',
-        data: data
+        params: data
+    })
+}
+
+//根据id获取类型
+export function getByID(data) {
+    return request({
+        url: '/type/get_by_id',
+        method: 'get',
+        params: data
     })
 }
 

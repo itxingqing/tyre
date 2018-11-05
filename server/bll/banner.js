@@ -8,12 +8,27 @@ class BannerBll {
         return await bannerDal.findAll();
     }
 
-    async delete(id) {
-        return !!(await bannerDal.delete(id));
+    async findByID(id){
+        return await bannerDal.findByID(id);
     }
 
-    async add(img_url) {
-        return await bannerDal.add(img_url);
+    async delete(id) {
+        let data = await this.findByID(id),
+            result = {
+                img: '',
+                act: true
+            }
+
+        if(data){
+            result.img = data.img;
+            result.act = !!(await bannerDal.delete(id));
+        }
+
+        return result;        
+    }
+
+    async add(obj) {
+        return await bannerDal.add(obj);
 
     }
 }

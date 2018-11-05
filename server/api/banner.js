@@ -39,7 +39,23 @@ router.post('/del', async (ctx, next) => {
         ctx.body = helper.warpResponseParams([], 500, '参数错误');
     } else {
         let result = await bannerBll.delete(id);
-        ctx.body = helper.warpResponseParams([], 0, '');
+
+        if (result.act) {
+
+            if (result.img) {
+                try {
+                    let filePath = path.join(config.uploadPath.replace(/\/upload$/, ''), result.img);
+
+                    fs.unlinkSync(filePath);
+                } catch (error) {
+                    //删除图片失败就不处理
+                }
+            }
+
+            ctx.body = helper.warpResponseParams([], 0, '');
+        } else {
+            ctx.body = helper.warpResponseParams([], 508, '');
+        }
     }
 });
 
@@ -76,7 +92,10 @@ router.post('/upload', async (ctx, next) => {
         readStream.pipe(writeStream);
 
         //save file
-        let result = await bannerBll.add(remoteUrl);
+        let result = await bannerBll.add({
+            img_url: remoteUrl,
+            ct_user: ctx._userInfo.uname
+        });
 
         result.url = result.img;
 
@@ -85,7 +104,7 @@ router.post('/upload', async (ctx, next) => {
         ctx.body = helper.warpResponseParams(result, 0, '');
 
     } catch (e) {
-        ctx.body = helper.warpResponseParams([], 0, '上传失败,请重试.');
+        ctx.body = helper.warpResponseParams([], 504, '上传失败,请重试.');
     }
 
 });
