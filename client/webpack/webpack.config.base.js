@@ -18,6 +18,8 @@ const outputPath = path.resolve(__dirname, '../dist');
 // const mainOutputPath = path.resolve(__dirname, '../dist/main');
 const manageOutPath = path.resolve(__dirname, '../dist/manage');
 
+const copyFile = require('copy-webpack-plugin');
+
 //移除dist生成的path
 function rmGenFile(outputPath) {
     let files = fs.readdirSync(outputPath);
@@ -131,6 +133,17 @@ module.exports = {
             // cache: true,
             verbose: true
         }),
+
+        new copyFile([
+            //复制文件
+            //ckeditor
+            {
+                from: `/${managePath}/common/editor`,
+                to: `${manageOutPath}/editor`,
+                force: true,
+            }
+
+        ])
     ],
     module: {
         rules: [{

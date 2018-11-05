@@ -2,7 +2,7 @@
     <div>
         <el-row class="table-container">
             <div class="action-bar">
-                <el-button type="primary" @click="addDailog = true">新增</el-button>
+                <el-button type="primary" @click="addDialog = true">新增</el-button>
             </div>
 
             <el-table border stripe :data="tdata" style="width: 100%" :height="tabelHeight">
