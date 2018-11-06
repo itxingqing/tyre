@@ -30,7 +30,7 @@ class BannerDal {
         });
     }
 
-    async add(img_url) {
+    async add(obj) {
         let {
             dataValues
         } = await banner.create(obj);

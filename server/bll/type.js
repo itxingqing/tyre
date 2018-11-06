@@ -12,6 +12,10 @@ class TypeBll {
         return await typeDal.findByID(id);
     }
 
+    async findAllType(){
+        return await typeDal.findAllType();
+    }
+
     async add(obj) {
         let ty_name = obj.ty_name,
             exists = !!await typeDal.findByTypeName(ty_name),

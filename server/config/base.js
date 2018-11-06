@@ -2,8 +2,12 @@ const path = require('path');
 
 module.exports = {
     uploadRemotePath: '/upload',
+    distPath: path.join(__dirname, '../../client/dist'),
     uploadPath: path.join(__dirname, '../../client/dist/upload'),
     uploadTempPath: path.join(__dirname, '../../client/dist/upload/temp'),
+    uploadTempRemotePath: '/upload/temp',
+    uploadProductPath: path.join(__dirname, '../../client/dist/upload/product'),
+    uploadProductRemotePath: '/upload/product',
 
     sessionConfig: {
         key: 'koa:sess',

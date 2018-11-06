@@ -25,6 +25,14 @@ export default {
         disabled: {
             type: Boolean,
             default: false
+        },
+        imageUploadUrl: {
+            type: String,
+            default: ""
+        },
+        imgUploadDataFile: {
+            type: String,
+            default: ""
         }
     },
 
@@ -112,7 +120,10 @@ export default {
             width: "100%",
             customConfig: "",
             removeDialogTabs: "image:advanced;link:advanced",
-            readOnly: that.disabled
+            readOnly: that.disabled,
+            image_previewText: "",
+            filebrowserImageUploadUrl: that.imageUploadUrl,
+            imgUploadDataFile: that.imgUploadDataFile.split(".")
 
             // // Set the most common block elements.
             // format_tags: 'p;h1;h2;h3;pre',
@@ -131,6 +142,10 @@ export default {
 
         getContent() {
             return this.editor.getData();
+        },
+
+        clearContent(){
+            this.editor.setData('');
         }
     }
 };

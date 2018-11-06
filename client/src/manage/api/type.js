@@ -9,6 +9,15 @@ export function get(data) {
     })
 }
 
+//获取所有的列表
+export function getAllType(data) {
+    return request({
+        url: '/type/get_all_type',
+        method: 'get',
+        params: data
+    })
+}
+
 //根据id获取类型
 export function getByID(data) {
     return request({

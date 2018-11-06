@@ -1,4 +1,6 @@
-const { productBll } = require('../bll/index');
+const {
+    productBll
+} = require('../bll/index');
 const Router = require('koa-router');
 const config = require('../config/base');
 const fs = require('fs');
@@ -23,15 +25,15 @@ router.use(helper.authorize);
 //删除失败508
 
 //获取产品的列表
-router.get('/list', async (ctx, next) => {    
+router.get('/list', async (ctx, next) => {
     let query = ctx.request.query,
-        pageIndex = query.pageIndex,
-        pageSize = query.pageSize;
+        pageIndex = query.pageIndex || 1,
+        pageSize = query.pageSize || 1;
 
-    if(pageIndex < 0){
+    if (pageIndex < 0) {
         pageIndex = 1;
     }
-    
+
     let list = await productBll.findByPage(pageIndex, pageSize);
     ctx.body = helper.warpResponseParams(list, 0, '');
 });
@@ -52,62 +54,62 @@ router.get('/get_by_id', async (ctx, next) => {
 
 //新增
 router.post('/add', async (ctx, next) => {
-    // let body = ctx.request.body,
-    //     data = {
-    //         ty_name: helper.trim(body.ty_name),
-    //         ty_i18n: {
-    //             zh_cn: helper.trim(body.ty_i18n.zh_cn),
-    //             en_us: helper.trim(body.ty_i18n.en_us)
-    //         },
-    //         ct_user: ctx._userInfo.uname
-    //     }
+    let body = ctx.request.body,
+        data = {
+            p_name: helper.trim(body.p_name),
+            p_img: body.p_img,
+            ty_name: helper.trim(body.ty_name),
+            content: helper.trim(body.content || ''),
+            ct_user: ctx._userInfo.uname
+        }
 
-    // if (!data.ty_name || !data.ty_i18n.zh_cn || !data.ty_i18n.en_us) {
-    //     ctx.body = helper.warpResponseParams([], 500, '参数错误');
-    // } else {
-    //     let result = await typeBll.add(data);
+    if (!data.p_img.length) {
+        ctx.body = helper.warpResponseParams({}, 506, '至少要上传一张图片');
+    } else if (!data.p_name || !data.ty_name) {
+        ctx.body = helper.warpResponseParams([], 500, '参数错误');
+    } else {
+        let result = await productBll.add(data);
 
-    //     if (result.message) {
-    //         ctx.body = helper.warpResponseParams({}, 506, result.message);;
-    //     } else {
-    //         ctx.body = helper.warpResponseParams(result.data, 0, '');;
-    //     }
-    // }
+        if (result.message) {
+            ctx.body = helper.warpResponseParams({}, 506, result.message);;
+        } else {
+            ctx.body = helper.warpResponseParams(result.data, 0, '');;
+        }
+    }
 });
 
 //修改
 router.post('/edit', async (ctx, next) => {
-    // let body = ctx.request.body,
-    //     id = body.id,
-    //     data = {
-    //         ty_name: helper.trim(body.ty_name),
-    //         ty_i18n: {
-    //             zh_cn: helper.trim(body.ty_i18n.zh_cn),
-    //             en_us: helper.trim(body.ty_i18n.en_us)
-    //         },
-    //         mfy_user: ctx._userInfo.uname
-    //     }
+    let body = ctx.request.body,
+        id = body.id,
+        data = {
+            p_name: helper.trim(body.p_name),
+            p_img: body.p_img,
+            ty_name: helper.trim(body.ty_name),
+            content: helper.trim(body.content || ''),
+            mfy_user: ctx._userInfo.uname
+        }
 
-    // if (id) {
-    //     let result = await typeBll.edit(id, data);
-    //     ctx.body = helper.warpResponseParams(result.data, result.message == '' ? 0 : 506, result.message);
-    // } else {
-    //     ctx.body = helper.warpResponseParams([], 500, '参数错误');
-    // }
+    if (id) {
+        let result = await productBll.edit(id, data);
+        ctx.body = helper.warpResponseParams(result.data, result.message == '' ? 0 : 507, result.message);
+    } else {
+        ctx.body = helper.warpResponseParams([], 500, '参数错误');
+    }
 });
 
 
 //删除
 router.post('/del', async (ctx, next) => {
-    // let id = ctx.request.body.id;
+    let id = ctx.request.body.id;
 
-    // if (id) {
-    //     await typeBll.del(id);
-    //     ctx.body = helper.warpResponseParams([], 0, '');
+    if (id) {
+        let message = await productBll.del(id);
+        ctx.body = helper.warpResponseParams([], message == '' ? 0 : 508, message);
 
-    // } else {
-    //     ctx.body = helper.warpResponseParams([], 500, '参数错误');
-    // }
+    } else {
+        ctx.body = helper.warpResponseParams([], 500, '参数错误');
+    }
 });
 
 //上传图片
@@ -127,9 +129,9 @@ router.post('/upload', async (ctx, next) => {
         return;
     }
     try {
-        let stats = fs.statSync(config.uploadTempPath);
-
-        if (!stats.isDirectory()) {
+        try {
+            fs.statSync(config.uploadTempPath);
+        } catch (error) {
             fs.mkdirSync(config.uploadTempPath);
         }
 
@@ -138,16 +140,42 @@ router.post('/upload', async (ctx, next) => {
             filename = path.join(config.uploadTempPath, name + ext),
             readStream = fs.createReadStream(file.path),
             writeStream = fs.createWriteStream(filename),
-            remoteUrl = path.join(config.uploadRemotePath, name + ext);
+            remoteUrl = path.join(config.uploadTempRemotePath, name + ext);
 
         readStream.pipe(writeStream);
 
-        ctx.body = helper.warpResponseParams(remoteUrl, 0, '');
+        ctx.body = helper.warpResponseParams({
+            url: remoteUrl
+        }, 0, '');
 
     } catch (e) {
         ctx.body = helper.warpResponseParams([], 504, '上传失败,请重试.');
     }
 
 });
+
+//删除上传temp文件, cron 晚上一点调用
+router.get('/del_temp', async (ctx, next) => {
+    let files = fs.readdirSync(config.uploadTempPath),
+        expireTime = 1000 * 60 * 60 * 24 * 2;
+
+    try {
+        files.forEach((item) => {
+
+            var fpath = path.resolve(config.uploadTempPath, item),
+                fstat = fs.statSync(fpath),
+                now = Date.now();
+
+            //超过两天就删除
+            if ((now - fstat.ctime.getTime()) > expireTime) {
+                fs.unlinkSync(fpath);
+            }
+        });
+
+    } catch (error) {}
+
+    ctx.body = helper.warpResponseParams({}, 0, '');
+})
+
 
 module.exports = router.routes();

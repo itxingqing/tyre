@@ -1,35 +1,37 @@
 <template>
     <div>
-        <el-dialog title="新增产品" top="3vh" :visible.sync="show" class="custom-dialog" :close-on-click-modal="false">
+        <el-dialog title="新增产品" top="3vh" :visible.sync="show" :show-close="false" class="custom-dialog" :close-on-click-modal="false">
             <el-form :model="form" :rules="formRules" label-width="80px" ref="form">
                 <el-form-item label="产品名称" prop="p_name">
                     <el-input v-model.trim="form.p_name" autocomplete="off"></el-input>
                 </el-form-item>
 
                 <el-form-item label="类型" prop="ty_name">
-                    <el-input v-model.trim="form.ty_name" autocomplete="off"></el-input>
+                    <el-select class="select-width" v-model="form.ty_name" placeholder="请选择类型">
+                        <el-option v-for="item in ty_select" :key="item.ty_name" :label="item.ty_name" :value="item.ty_name">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
 
                 <el-form-item label="图片">
-                    <el-upload :on-success="uploadSuccess" :on-error="uploadError" action="/api/product/upload" :file-list="files" list-type="picture-card" accept="image/*" :on-preview="handlePictureCardPreview" :before-remove="handleRemove">
+                    <el-upload :on-success="uploadSuccess" :on-error="uploadError" :file-list="fileList" :action="uploadImageUrl" list-type="picture-card" accept="image/*" :on-remove="removeFile" :on-preview="handlePictureCardPreview">
                         <i class="el-icon-plus"></i>
                     </el-upload>
                 </el-form-item>
 
                 <el-form-item label="内容">
-                    <ck-editor ref="addEditor" :content="form.content"></ck-editor>
+                    <ck-editor img-upload-data-file="data.url" ref="addEditor" :image-upload-url="uploadImageUrl" content=""></ck-editor>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="closeDialog">取 消</el-button>
-                <el-button type="primary" @click="addCommit">确 定</el-button>
+                <el-button @click="closeDialog">取消</el-button>
+                <el-button type="primary" @click="addCommit">确定</el-button>
             </div>
         </el-dialog>
 
         <el-dialog class="image-prew-dialog" :show-close="false" :visible.sync="previewDialog">
             <img class="image-prew" width="100%" :src="imageViewurl" alt="封面图片">
         </el-dialog>
-
     </div>
 </template>
 
@@ -52,6 +54,23 @@ export default {
         }
     },
 
+    created() {
+        let that = this;
+
+        that.$api.type
+            .getAllType()
+            .then(res => {
+                if (res.error == 0) {
+                    that.ty_select = res.data;
+                } else if (res.error == 505) {
+                    that.$message.error("获取类型数据失败，请刷新后重试.");
+                }
+            })
+            .catch(res => {
+                that.$message.error("获取类型数据失败，请刷新后重试.");
+            });
+    },
+
     data() {
         return {
             form: {
@@ -61,9 +80,17 @@ export default {
                 content: ""
             },
 
+            //上传地址
+            uploadImageUrl: "/api/product/upload",
+
+            //预览框
             imageViewurl: "",
             previewDialog: false,
 
+            //上传文件列表
+            fileList: [],
+
+            //选择列表
             ty_select: [],
 
             formRules: {
@@ -92,7 +119,8 @@ export default {
                 lastFile = fileList[fileList.length - 1];
             if (res.error == 0) {
                 lastFile.url = res.data.url;
-                lastFile.id = res.data.id;
+
+                that.form.p_img.push(res.data.url);
             } else if (res.error == 504) {
                 fileList.splice(fileList.length - 1, 1);
 
@@ -104,41 +132,18 @@ export default {
             that.$message.error("上传失败，请刷新后重试.");
         },
 
-        handleRemove(file, fileList) {
-            let that = this;
+        removeFile(file, fileList) {
+            let that = this,
+                url = file.url;
 
-            return new Promise((resolve, reject) => {
-                if (file && file.id) {
-                    let fileID = file.id;
+            for (var i = 0; i < that.form.p_img.length; i++) {
+                var item = that.form.p_img[i];
 
-                    that.$api.banner
-                        .del({
-                            id: fileID
-                        })
-                        .then(res => {
-                            if (res.error == 0) {
-                                that.$message({
-                                    message: "删除成功.",
-                                    type: "success",
-                                    duration: 800
-                                });
-
-                                resolve("");
-                            } else if (res.error == 508) {
-                                reject("");
-
-                                that.$message.error("删除失败，请刷新后重试.");
-                            }
-                        })
-                        .catch(res => {
-                            reject("");
-
-                            that.$message.error("删除失败，请刷新后重试.");
-                        });
-                } else {
-                    resolve("");
+                if (item == file.url) {
+                    that.form.p_img.splice(i, 1);
+                    break;
                 }
-            });
+            }
         },
 
         handlePictureCardPreview(file) {
@@ -149,36 +154,55 @@ export default {
         addCommit() {
             let that = this;
 
-            // that.$refs["form"].validate(valid => {
-            //     if (valid) {
-            //         that.$api.type
-            //             .add(that.form)
-            //             .then(res => {
-            //                 if (res.error == 0) {
-            //                     that.$emit(
-            //                         "add-item",
-            //                         JSON.parse(JSON.stringify(res.data))
-            //                     );
+            that.form.content = that.$refs["addEditor"].getContent();
 
-            //                     that.$message({
-            //                         message: "新增成功.",
-            //                         type: "success",
-            //                         duration: 800
-            //                     });
+            that.$refs["form"].validate(valid => {
+                if (valid) {
+                    that.$api.product
+                        .add(that.form)
+                        .then(res => {
+                            if (res.error == 0) {
+                                that.$emit(
+                                    "add-item",
+                                    JSON.parse(JSON.stringify(res.data))
+                                );
 
-            //                     that.closeDialog();
-            //                 } else if (res.error == 500 || res.error == 506) {
-            //                     that.$message.error(res.message);
-            //                 }
-            //             })
-            //             .catch(res => {
-            //                 that.$message.error("新增失败，请重试.");
-            //             });
-            //     }
-            // });
+                                that.$message({
+                                    message: "新增成功.",
+                                    type: "success",
+                                    duration: 800
+                                });
+
+                                that.closeDialog();
+
+                                that.form.p_img = [];
+                                that.fileList = [];
+
+                                that.$refs["addEditor"].clearContent();
+                            } else if (res.error == 500 || res.error == 506) {
+                                that.$message.error(res.message);
+                            }
+                        })
+                        .catch(res => {
+                            that.$message.error("新增失败，请重试.");
+                        });
+                }
+            });
+        },
+
+        //关闭窗口后调用
+        afterClose() {
+            let that = this;
+            that.form.p_img = [];
+            that.fileList = [];
+
+            that.$refs["addEditor"].clearContent();
         }
     }
 };
 </script>
 <style lang='less' scoped>
+.select-width {
+    width: 100%;
+}
 </style>

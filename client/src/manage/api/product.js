@@ -45,3 +45,13 @@ export function del(data) {
     })
 }
 
+
+//测试删除temp
+// export function del_temp(data) {
+//     return request({
+//         url: '/product/del_temp',
+//         method: 'get',
+//         params: data
+//     })
+// }
+

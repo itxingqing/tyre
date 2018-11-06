@@ -27,9 +27,7 @@ class ProductDal {
     }
 
     async update(id, obj) {
-        return await product.update({
-            obj
-        }, {
+        return await product.update(obj, {
             where: {
                 id: id
             }

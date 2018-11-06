@@ -24,8 +24,8 @@ router.use(helper.authorize);
 //获取列表
 router.get('/list', async (ctx, next) => {
     let query = ctx.request.query,
-        pageIndex = query.pageIndex,
-        pageSize = query.pageSize;
+        pageIndex = query.pageIndex || 1,
+        pageSize = query.pageSize || 1;
 
     if (pageIndex < 0) {
         pageIndex = 1;
@@ -34,6 +34,13 @@ router.get('/list', async (ctx, next) => {
     let list = await typeBll.findByPage(pageIndex, pageSize);
     ctx.body = helper.warpResponseParams(list, 0, '');
 });
+
+//获取所有的类型
+router.get('/get_all_type', async (ctx, next) => {
+
+    let list = await typeBll.findAllType();
+    ctx.body = helper.warpResponseParams(list, 0, '');
+})
 
 //根据id获取数据
 router.get('/get_by_id', async (ctx, next) => {
@@ -89,7 +96,7 @@ router.post('/edit', async (ctx, next) => {
 
     if (id) {
         let result = await typeBll.edit(id, data);
-        ctx.body = helper.warpResponseParams(result.data, result.message == '' ? 0 : 506, result.message);
+        ctx.body = helper.warpResponseParams(result.data, result.message == '' ? 0 : 507, result.message);
     } else {
         ctx.body = helper.warpResponseParams([], 500, '参数错误');
     }

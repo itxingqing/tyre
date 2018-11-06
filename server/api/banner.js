@@ -93,7 +93,7 @@ router.post('/upload', async (ctx, next) => {
 
         //save file
         let result = await bannerBll.add({
-            img_url: remoteUrl,
+            img: remoteUrl,
             ct_user: ctx._userInfo.uname
         });
 

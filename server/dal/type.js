@@ -12,6 +12,15 @@ class TypeDal {
         });
     }
 
+    async findAllType() {
+        return await type.findAll({
+            attributes: ['ty_name'],
+            order: [
+                ['ct_time', 'asc']
+            ]
+        });
+    }
+
     async findByID(id) {
         return await type.find({
             where: {
